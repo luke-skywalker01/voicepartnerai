@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Workflow Builder - VoicePartnerAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .workflow-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Top Toolbar */
+        .toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .toolbar-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .toolbar-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .toolbar-btn.primary {
+            background: #059669;
+            border-color: #059669;
+        }
+        
+        .toolbar-btn.primary:hover {
+            background: #047857;
+        }
+        
+        .workflow-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Left Panel - Node Palette */
+        .left-panel {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .panel-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .node-palette {
+            padding: 1rem;
+        }
+        
+        .node-category {
+            margin-bottom: 1.5rem;
+        }
+        
+        .category-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .node-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: grab;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .node-item:hover {
+            border-color: #6366f1;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .node-item:active {
+            cursor: grabbing;
+        }
+        
+        .node-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .node-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .node-info p {
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        
+        /* Main Canvas */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+            background: #f8fafc;
+        }
+        
+        .workflow-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle, #d1d5db 1px, transparent 1px);
+            background-size: 20px 20px;
+            cursor: grab;
+        }
+        
+        .workflow-canvas:active {
+            cursor: grabbing;
+        }
+        
+        /* Right Panel - Properties */
+        .right-panel {
+            width: 320px;
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        
+        .properties-panel {
+            padding: 1rem;
+        }
+        
+        .property-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .property-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .property-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+        
+        .property-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .property-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Workflow Nodes */
+        .workflow-node {
+            position: absolute;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            min-width: 180px;
+            cursor: move;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            user-select: none;
+            transition: all 0.2s;
+        }
+        
+        .workflow-node:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .workflow-node.selected {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .workflow-node.conversation { border-color: #059669; }
+        .workflow-node.api_request { border-color: #0891b2; }
+        .workflow-node.transfer_call { border-color: #dc2626; }
+        .workflow-node.end_call { border-color: #7c2d12; }
+        .workflow-node.conditional { border-color: #7c3aed; }
+        
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .node-header-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .node-title {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.875rem;
+        }
+        
+        .node-body {
+            padding: 1rem;
+        }
+        
+        .node-content {
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        
+        .node-connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #6366f1;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .node-connection-point:hover {
+            transform: scale(1.3);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+        }
+        
+        .node-input {
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .node-output {
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Connection Lines */
+        .connection-line {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .connection-path {
+            fill: none;
+            stroke: #6366f1;
+            stroke-width: 2;
+            stroke-dasharray: 0;
+            transition: all 0.3s;
+        }
+        
+        .connection-path:hover {
+            stroke-width: 3;
+            stroke: #4f46e5;
+        }
+        
+        /* Variable Inspector */
+        .variables-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .variable-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .variable-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .variable-type {
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        /* Execution Status */
+        .execution-status {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #059669;
+        }
+        
+        .status-dot.pending { background: #f59e0b; }
+        .status-dot.running { background: #3b82f6; animation: pulse 2s infinite; }
+        .status-dot.completed { background: #059669; }
+        .status-dot.failed { background: #dc2626; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Cost Calculator Widget */
+        .cost-calculator {
+            position: fixed;
+            top: 70px;
+            right: 1rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            width: 280px;
+            display: none;
+        }
+        
+        .calculator-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cost-breakdown {
+            font-size: 0.875rem;
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .cost-item.total {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .provider-tag {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            background: #f3f4f6;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <!-- Top Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <i class="fas fa-project-diagram" style="font-size: 1.5rem;"></i>
+                <span class="workflow-name" id="workflow-name">Neuer Workflow</span>
+            </div>
+            
+            <div class="toolbar-center">
+                <button class="toolbar-btn" onclick="zoomIn()">
+                    <i class="fas fa-search-plus"></i>
+                    Zoom In
+                </button>
+                <button class="toolbar-btn" onclick="zoomOut()">
+                    <i class="fas fa-search-minus"></i>
+                    Zoom Out
+                </button>
+                <button class="toolbar-btn" onclick="resetZoom()">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    Reset
+                </button>
+            </div>
+            
+            <div class="toolbar-right">
+                <button class="toolbar-btn" onclick="toggleCostCalculator()">
+                    <i class="fas fa-calculator"></i>
+                    Kosten
+                </button>
+                <button class="toolbar-btn" onclick="executeWorkflow()">
+                    <i class="fas fa-play"></i>
+                    Testen
+                </button>
+                <button class="toolbar-btn primary" onclick="saveWorkflow()">
+                    <i class="fas fa-save"></i>
+                    Speichern
+                </button>
+            </div>
+        </div>
+        
+        <!-- Left Panel - Node Palette -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <h3 class="panel-title">Node-Bibliothek</h3>
+                <p class="panel-description">Ziehe Nodes auf die Canvas um deinen Workflow zu erstellen</p>
+            </div>
+            
+            <div class="node-palette" id="node-palette">
+                <!-- Nodes will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Main Canvas -->
+        <div class="canvas-container">
+            <div class="workflow-canvas" id="workflow-canvas">
+                <svg id="connections-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></svg>
+                <!-- Workflow nodes will be added here -->
+            </div>
+        </div>
+        
+        <!-- Right Panel - Properties -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <h3 class="panel-title">Properties</h3>
+                <p class="panel-description">Konfiguriere den ausgewählten Node</p>
+            </div>
+            
+            <div class="properties-panel" id="properties-panel">
+                <div id="no-selection" style="text-align: center; color: #6b7280; padding: 2rem;">
+                    <i class="fas fa-mouse-pointer" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    Wähle einen Node aus um seine Properties zu bearbeiten
+                </div>
+                
+                <div id="node-properties" style="display: none;">
+                    <!-- Node properties will be shown here -->
+                </div>
+                
+                <div class="variables-section">
+                    <h4 class="property-label">
+                        <i class="fas fa-code"></i> Workflow Variables
+                    </h4>
+                    <div id="variables-list">
+                        <!-- Variables will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Execution Status -->
+        <div class="execution-status" id="execution-status">
+            <div class="status-indicator">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Bereit</span>
+            </div>
+        </div>
+        
+        <!-- Cost Calculator Widget -->
+        <div class="cost-calculator" id="cost-calculator">
+            <div class="calculator-title">
+                <i class="fas fa-euro-sign"></i>
+                Kosten-Kalkulator
+            </div>
+            
+            <div class="property-group">
+                <label class="property-label">Gesprächsdauer (Minuten)</label>
+                <input type="number" class="property-input" id="duration-input" value="5" min="0.1" step="0.1">
+            </div>
+            
+            <div class="property-group">
+                <label class="property-label">LLM Modell</label>
+                <select class="property-input" id="model-select">
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-4o-mini">GPT-4o Mini</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                </select>
+            </div>
+            
+            <div class="cost-breakdown" id="cost-breakdown">
+                <!-- Cost breakdown will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🚀 ADVANCED WORKFLOW BUILDER - VoicePartnerAI
+        const API_BASE = 'http://localhost:8007/api';
+        const AUTH_TOKEN = 'token-dev@voicepartner.ai-demo';
+        
+        let currentWorkflow = {
+            id: null,
+            name: 'Neuer Workflow',
+            nodes: [],
+            connections: [],
+            variables: {}
+        };
+        
+        let selectedNode = null;
+        let draggedNode = null;
+        let isConnecting = false;
+        let connectionStart = null;
+        let nodeTypes = [];
+        let canvasOffset = { x: 0, y: 0 };
+        let canvasScale = 1;
+        
+        // Get auth headers
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AUTH_TOKEN}`
+            };
+        }
+        
+        // Initialize workflow builder
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Advanced Workflow Builder loaded');
+            
+            await loadNodeTypes();
+            setupCanvasInteraction();
+            setupDragAndDrop();
+            
+            // Create initial start node
+            createNode('conversation', 200, 150, {
+                name: 'Start',
+                message: 'Hallo! Wie kann ich Ihnen helfen?',
+                is_start: true
+            });
+        });
+        
+        // Load available node types from backend
+        async function loadNodeTypes() {
+            try {
+                const response = await fetch(`${API_BASE}/workflows/node-types`, {
+                    headers: getAuthHeaders()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    nodeTypes = data.node_types;
+                    renderNodePalette();
+                }
+            } catch (error) {
+                console.error('❌ Error loading node types:', error);
+                // Fallback to default node types
+                nodeTypes = [
+                    {
+                        type: 'conversation',
+                        name: 'Conversation',
+                        description: 'Handle user conversations',
+                        icon: '💬'
+                    },
+                    {
+                        type: 'api_request',
+                        name: 'API Request', 
+                        description: 'Make external API calls',
+                        icon: '🌐'
+                    },
+                    {
+                        type: 'transfer_call',
+                        name: 'Transfer Call',
+                        description: 'Transfer to human agent',
+                        icon: '📞'
+                    },
+                    {
+                        type: 'end_call',
+                        name: 'End Call',
+                        description: 'End conversation',
+                        icon: '🔚'
+                    },
+                    {
+                        type: 'conditional',
+                        name: 'Conditional',
+                        description: 'Conditional logic',
+                        icon: '🔀'
+                    }
+                ];
+                renderNodePalette();
+            }
+        }
+        
+        // Render node palette
+        function renderNodePalette() {
+            const palette = document.getElementById('node-palette');
+            
+            const categories = {
+                'Grundlagen': ['conversation', 'end_call'],
+                'Aktionen': ['api_request', 'transfer_call'],
+                'Logik': ['conditional']
+            };
+            
+            palette.innerHTML = '';
+            
+            Object.entries(categories).forEach(([categoryName, nodeTypeIds]) => {
+                const category = document.createElement('div');
+                category.className = 'node-category';
+                
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.textContent = categoryName;
+                category.appendChild(title);
+                
+                nodeTypeIds.forEach(typeId => {
+                    const nodeType = nodeTypes.find(nt => nt.type === typeId);
+                    if (!nodeType) return;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'node-item';
+                    item.draggable = true;
+                    item.dataset.nodeType = nodeType.type;
+                    
+                    item.innerHTML = `
+                        <div class="node-icon" style="background: ${getNodeColor(nodeType.type)}; color: white;">
+                            ${nodeType.icon}
+                        </div>
+                        <div class="node-info">
+                            <h4>${nodeType.name}</h4>
+                            <p>${nodeType.description}</p>
+                        </div>
+                    `;
+                    
+                    category.appendChild(item);
+                });
+                
+                palette.appendChild(category);
+            });
+        }
+        
+        // Get node color by type
+        function getNodeColor(type) {
+            const colors = {
+                'conversation': '#059669',
+                'api_request': '#0891b2', 
+                'transfer_call': '#dc2626',
+                'end_call': '#7c2d12',
+                'conditional': '#7c3aed'
+            };
+            return colors[type] || '#6b7280';
+        }
+        
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const canvas = document.getElementById('workflow-canvas');
+            
+            // Handle drag start from palette
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('node-item')) {
+                    draggedNode = e.target.dataset.nodeType;
+                    e.dataTransfer.effectAllowed = 'copy';
+                }
+            });
+            
+            // Handle drop on canvas
+            canvas.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            });
+            
+            canvas.addEventListener('drop', function(e) {
+                e.preventDefault();
+                
+                if (draggedNode) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - canvasOffset.x) / canvasScale;
+                    const y = (e.clientY - rect.top - canvasOffset.y) / canvasScale;
+                    
+                    createNode(draggedNode, x, y);
+                    draggedNode = null;
+                }
+            });
+        }
+        
+        // Create workflow node
+        function createNode(type, x, y, parameters = {}) {
+            const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const nodeType = nodeTypes.find(nt => nt.type === type);
+            
+            if (!nodeType) {
+                console.error('❌ Unknown node type:', type);
+                return;
+            }
+            
+            const node = {
+                id: nodeId,
+                type: type,
+                name: parameters.name || nodeType.name,
+                position: { x: x, y: y },
+                parameters: parameters
+            };
+            
+            currentWorkflow.nodes.push(node);
+            renderNode(node);
+            
+            console.log('✅ Node created:', node);
+        }
+        
+        // Render single node on canvas
+        function renderNode(node) {
+            const canvas = document.getElementById('workflow-canvas');
+            const nodeType = nodeTypes.find(nt => nt.type === node.type);
+            
+            const nodeEl = document.createElement('div');
+            nodeEl.className = `workflow-node ${node.type}`;
+            nodeEl.id = node.id;
+            nodeEl.style.left = node.position.x + 'px';
+            nodeEl.style.top = node.position.y + 'px';
+            
+            nodeEl.innerHTML = `
+                <div class="node-header">
+                    <div class="node-header-icon" style="background: ${getNodeColor(node.type)}; color: white;">
+                        ${nodeType.icon}
+                    </div>
+                    <div class="node-title">${node.name}</div>
+                </div>
+                <div class="node-body">
+                    <div class="node-content">
+                        ${getNodePreview(node)}
+                    </div>
+                </div>
+                <div class="node-connection-point node-input"></div>
+                <div class="node-connection-point node-output"></div>
+            `;
+            
+            // Add event listeners
+            nodeEl.addEventListener('click', () => selectNode(node));
+            nodeEl.addEventListener('mousedown', (e) => startNodeDrag(e, node));
+            
+            // Connection point events
+            const inputPoint = nodeEl.querySelector('.node-input');
+            const outputPoint = nodeEl.querySelector('.node-output');
+            
+            outputPoint.addEventListener('mousedown', (e) => startConnection(e, node.id, 'output'));
+            inputPoint.addEventListener('mouseup', (e) => endConnection(e, node.id, 'input'));
+            
+            canvas.appendChild(nodeEl);
+        }
+        
+        // Get node preview text
+        function getNodePreview(node) {
+            switch (node.type) {
+                case 'conversation':
+                    return node.parameters.message || 'Konversations-Node';
+                case 'api_request':
+                    return node.parameters.url || 'API Request';
+                case 'transfer_call':
+                    return node.parameters.number || 'Transfer Call';
+                case 'end_call':
+                    return node.parameters.message || 'Gespräch beenden';
+                case 'conditional':
+                    return 'Bedingung prüfen';
+                default:
+                    return node.name;
+            }
+        }
+        
+        // Select node
+        function selectNode(node) {
+            // Clear previous selection
+            document.querySelectorAll('.workflow-node').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Select current node
+            const nodeEl = document.getElementById(node.id);
+            nodeEl.classList.add('selected');
+            
+            selectedNode = node;
+            showNodeProperties(node);
+            
+            console.log('🎯 Node selected:', node);
+        }
+        
+        // Show node properties panel
+        function showNodeProperties(node) {
+            const noSelection = document.getElementById('no-selection');
+            const nodeProperties = document.getElementById('node-properties');
+            
+            noSelection.style.display = 'none';
+            nodeProperties.style.display = 'block';
+            
+            const nodeType = nodeTypes.find(nt => nt.type === node.type);
+            
+            nodeProperties.innerHTML = `
+                <div class="property-group">
+                    <label class="property-label">Node Name</label>
+                    <input type="text" class="property-input" id="node-name-input" value="${node.name}" onchange="updateNodeProperty('name', this.value)">
+                </div>
+                
+                ${renderNodeTypeProperties(node, nodeType)}
+            `;
+        }
+        
+        // Render node-specific properties
+        function renderNodeTypeProperties(node, nodeType) {
+            if (!nodeType.parameters) return '';
+            
+            let html = '';
+            
+            Object.entries(nodeType.parameters).forEach(([paramName, paramConfig]) => {
+                const currentValue = node.parameters[paramName] || '';
+                
+                html += `<div class="property-group">`;
+                html += `<label class="property-label">${paramName.charAt(0).toUpperCase() + paramName.slice(1)}</label>`;
+                
+                if (paramConfig.type === 'string' && paramName.includes('message')) {
+                    html += `<textarea class="property-input property-textarea" id="${paramName}-input" onchange="updateNodeParameter('${paramName}', this.value)" placeholder="${paramConfig.placeholder || ''}">${currentValue}</textarea>`;
+                } else if (paramConfig.type === 'string') {
+                    html += `<input type="text" class="property-input" id="${paramName}-input" value="${currentValue}" onchange="updateNodeParameter('${paramName}', this.value)" placeholder="${paramConfig.placeholder || ''}">`;
+                } else if (paramConfig.type === 'array') {
+                    html += `<textarea class="property-input" id="${paramName}-input" onchange="updateNodeParameter('${paramName}', JSON.parse(this.value))" placeholder="JSON Array">${JSON.stringify(currentValue, null, 2)}</textarea>`;
+                } else {
+                    html += `<input type="text" class="property-input" id="${paramName}-input" value="${currentValue}" onchange="updateNodeParameter('${paramName}', this.value)">`;
+                }
+                
+                html += `</div>`;
+            });
+            
+            return html;
+        }
+        
+        // Update node property
+        function updateNodeProperty(property, value) {
+            if (selectedNode) {
+                selectedNode[property] = value;
+                
+                // Update visual representation
+                const nodeEl = document.getElementById(selectedNode.id);
+                if (property === 'name') {
+                    nodeEl.querySelector('.node-title').textContent = value;
+                }
+                
+                console.log(`✏️ Updated ${property}:`, value);
+            }
+        }
+        
+        // Update node parameter
+        function updateNodeParameter(parameter, value) {
+            if (selectedNode) {
+                selectedNode.parameters[parameter] = value;
+                
+                // Update node preview
+                const nodeEl = document.getElementById(selectedNode.id);
+                nodeEl.querySelector('.node-content').textContent = getNodePreview(selectedNode);
+                
+                console.log(`✏️ Updated parameter ${parameter}:`, value);
+            }
+        }
+        
+        // Start node drag
+        function startNodeDrag(e, node) {
+            if (e.target.classList.contains('node-connection-point')) return;
+            
+            e.preventDefault();
+            const nodeEl = document.getElementById(node.id);
+            
+            const startX = e.clientX - node.position.x * canvasScale - canvasOffset.x;
+            const startY = e.clientY - node.position.y * canvasScale - canvasOffset.y;
+            
+            function onMouseMove(e) {
+                const newX = (e.clientX - startX - canvasOffset.x) / canvasScale;
+                const newY = (e.clientY - startY - canvasOffset.y) / canvasScale;
+                
+                node.position.x = Math.max(0, newX);
+                node.position.y = Math.max(0, newY);
+                
+                nodeEl.style.left = node.position.x + 'px';
+                nodeEl.style.top = node.position.y + 'px';
+                
+                updateConnections();
+            }
+            
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+        
+        // Start connection
+        function startConnection(e, nodeId, point) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            isConnecting = true;
+            connectionStart = { nodeId, point };
+            
+            console.log('🔗 Start connection from:', nodeId, point);
+        }
+        
+        // End connection
+        function endConnection(e, nodeId, point) {
+            e.stopPropagation();
+            
+            if (isConnecting && connectionStart && connectionStart.nodeId !== nodeId) {
+                createConnection(connectionStart.nodeId, nodeId);
+                console.log('✅ Connection created:', connectionStart.nodeId, '->', nodeId);
+            }
+            
+            isConnecting = false;
+            connectionStart = null;
+        }
+        
+        // Create connection between nodes
+        function createConnection(sourceId, targetId) {
+            const connectionId = `conn-${Date.now()}`;
+            
+            const connection = {
+                id: connectionId,
+                sourceNodeId: sourceId,
+                targetNodeId: targetId
+            };
+            
+            currentWorkflow.connections.push(connection);
+            updateConnections();
+        }
+        
+        // Update all connection visuals
+        function updateConnections() {
+            const svg = document.getElementById('connections-svg');
+            svg.innerHTML = '';
+            
+            currentWorkflow.connections.forEach(connection => {
+                const sourceNode = currentWorkflow.nodes.find(n => n.id === connection.sourceNodeId);
+                const targetNode = currentWorkflow.nodes.find(n => n.id === connection.targetNodeId);
+                
+                if (sourceNode && targetNode) {
+                    drawConnection(svg, sourceNode, targetNode);
+                }
+            });
+        }
+        
+        // Draw single connection
+        function drawConnection(svg, sourceNode, targetNode) {
+            const sourceX = sourceNode.position.x + 90; // Node width/2
+            const sourceY = sourceNode.position.y + 120; // Node height
+            const targetX = targetNode.position.x + 90;
+            const targetY = targetNode.position.y;
+            
+            const midY = (sourceY + targetY) / 2;
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('class', 'connection-path');
+            path.setAttribute('d', `M ${sourceX},${sourceY} C ${sourceX},${midY} ${targetX},${midY} ${targetX},${targetY}`);
+            
+            svg.appendChild(path);
+        }
+        
+        // Setup canvas interaction (pan/zoom)
+        function setupCanvasInteraction() {
+            const canvas = document.getElementById('workflow-canvas');
+            
+            let isPanning = false;
+            let lastPanPoint = { x: 0, y: 0 };
+            
+            canvas.addEventListener('mousedown', function(e) {
+                if (e.target === canvas) {
+                    isPanning = true;
+                    lastPanPoint.x = e.clientX;
+                    lastPanPoint.y = e.clientY;
+                    canvas.style.cursor = 'grabbing';
+                }
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isPanning) {
+                    const deltaX = e.clientX - lastPanPoint.x;
+                    const deltaY = e.clientY - lastPanPoint.y;
+                    
+                    canvasOffset.x += deltaX;
+                    canvasOffset.y += deltaY;
+                    
+                    updateCanvasTransform();
+                    
+                    lastPanPoint.x = e.clientX;
+                    lastPanPoint.y = e.clientY;
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                if (isPanning) {
+                    isPanning = false;
+                    canvas.style.cursor = 'grab';
+                }
+            });
+            
+            // Zoom with mouse wheel
+            canvas.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                canvasScale *= zoomFactor;
+                canvasScale = Math.max(0.3, Math.min(canvasScale, 2));
+                
+                updateCanvasTransform();
+            });
+        }
+        
+        // Update canvas transform
+        function updateCanvasTransform() {
+            const canvas = document.getElementById('workflow-canvas');
+            canvas.style.transform = `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${canvasScale})`;
+            canvas.style.transformOrigin = '0 0';
+        }
+        
+        // Zoom functions
+        function zoomIn() {
+            canvasScale *= 1.2;
+            canvasScale = Math.min(canvasScale, 2);
+            updateCanvasTransform();
+        }
+        
+        function zoomOut() {
+            canvasScale *= 0.8;
+            canvasScale = Math.max(canvasScale, 0.3);
+            updateCanvasTransform();
+        }
+        
+        function resetZoom() {
+            canvasScale = 1;
+            canvasOffset = { x: 0, y: 0 };
+            updateCanvasTransform();
+        }
+        
+        // Toggle cost calculator
+        function toggleCostCalculator() {
+            const calculator = document.getElementById('cost-calculator');
+            const isVisible = calculator.style.display !== 'none';
+            
+            calculator.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                updateCostCalculation();
+            }
+        }
+        
+        // Update cost calculation
+        async function updateCostCalculation() {
+            const duration = parseFloat(document.getElementById('duration-input').value) || 5;
+            const model = document.getElementById('model-select').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/pricing/estimate`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        duration_minutes: duration,
+                        llm_model: model
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderCostBreakdown(data);
+                }
+            } catch (error) {
+                console.error('❌ Error calculating costs:', error);
+            }
+        }
+        
+        // Render cost breakdown
+        function renderCostBreakdown(data) {
+            const breakdown = document.getElementById('cost-breakdown');
+            
+            breakdown.innerHTML = `
+                <div class="cost-item">
+                    <span>STT (Deepgram)<span class="provider-tag">€0.01/min</span></span>
+                    <span>€${data.estimated_costs.stt_cost?.toFixed(4) || '0.0000'}</span>
+                </div>
+                <div class="cost-item">
+                    <span>LLM (${data.llm_model || 'OpenAI'})<span class="provider-tag">${data.llm_model}</span></span>
+                    <span>€${data.estimated_costs.llm_cost?.toFixed(4) || '0.0000'}</span>
+                </div>
+                <div class="cost-item">
+                    <span>TTS (ElevenLabs)<span class="provider-tag">€0.05/min</span></span>
+                    <span>€${data.estimated_costs.tts_cost?.toFixed(4) || '0.0000'}</span>
+                </div>
+                <div class="cost-item">
+                    <span>Platform Fee<span class="provider-tag">VoicePartnerAI</span></span>
+                    <span>€${data.estimated_costs.platform_cost?.toFixed(4) || '0.0000'}</span>
+                </div>
+                <div class="cost-item total">
+                    <span><strong>Gesamtkosten</strong></span>
+                    <span><strong>€${data.total_cost?.toFixed(4) || '0.0000'}</strong></span>
+                </div>
+                <div class="cost-item" style="margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280;">
+                    <span>Pro Minute:</span>
+                    <span>€${data.cost_per_minute?.toFixed(4) || '0.0000'}</span>
+                </div>
+            `;
+        }
+        
+        // Save workflow
+        async function saveWorkflow() {
+            try {
+                const workflowData = {
+                    name: currentWorkflow.name,
+                    description: `Advanced workflow with ${currentWorkflow.nodes.length} nodes`,
+                    nodes: currentWorkflow.nodes,
+                    connections: currentWorkflow.connections,
+                    settings: {
+                        canvas_position: canvasOffset,
+                        canvas_scale: canvasScale
+                    },
+                    active: true
+                };
+                
+                const response = await fetch(`${API_BASE}/workflows/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(workflowData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    currentWorkflow.id = result.id;
+                    
+                    alert(`✅ Workflow "${currentWorkflow.name}" erfolgreich gespeichert!\n\nID: ${result.id}\nNodes: ${currentWorkflow.nodes.length}\nConnections: ${currentWorkflow.connections.length}`);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error saving workflow:', error);
+                alert('❌ Fehler beim Speichern des Workflows');
+            }
+        }
+        
+        // Execute workflow (test)
+        async function executeWorkflow() {
+            if (!currentWorkflow.id) {
+                alert('⚠️ Bitte speichere den Workflow zuerst');
+                return;
+            }
+            
+            try {
+                const executionStatus = document.getElementById('execution-status');
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                
+                executionStatus.style.display = 'block';
+                statusDot.className = 'status-dot running';
+                statusText.textContent = 'Workflow wird ausgeführt...';
+                
+                // Start execution
+                const startResponse = await fetch(`${API_BASE}/workflows/${currentWorkflow.id}/execute`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        workflow_id: currentWorkflow.id,
+                        session_id: `test-session-${Date.now()}`,
+                        initial_context: {
+                            user_input: 'Hallo, ich möchte Informationen'
+                        }
+                    })
+                });
+                
+                if (startResponse.ok) {
+                    const execution = await startResponse.json();
+                    console.log('✅ Workflow execution started:', execution);
+                    
+                    // Process steps
+                    let stepCount = 0;
+                    let executionId = execution.execution_id;
+                    
+                    while (stepCount < 10) { // Max 10 steps
+                        const stepResponse = await fetch(`${API_BASE}/workflow-executions/step`, {
+                            method: 'POST',
+                            headers: getAuthHeaders(),
+                            body: JSON.stringify({
+                                execution_id: executionId,
+                                context: {
+                                    user_input: `Test message ${stepCount + 1}`
+                                }
+                            })
+                        });
+                        
+                        if (stepResponse.ok) {
+                            const stepResult = await stepResponse.json();
+                            console.log(`Step ${stepCount + 1}:`, stepResult);
+                            
+                            statusText.textContent = `Schritt ${stepCount + 1}: ${stepResult.current_node}`;
+                            
+                            if (stepResult.execution_status === 'completed') {
+                                statusDot.className = 'status-dot completed';
+                                statusText.textContent = 'Workflow erfolgreich ausgeführt';
+                                break;
+                            } else if (stepResult.execution_status === 'failed') {
+                                statusDot.className = 'status-dot failed';
+                                statusText.textContent = 'Workflow-Ausführung fehlgeschlagen';
+                                break;
+                            }
+                        }
+                        
+                        stepCount++;
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                    
+                } else {
+                    throw new Error(`HTTP ${startResponse.status}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error executing workflow:', error);
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                statusDot.className = 'status-dot failed';
+                statusText.textContent = 'Ausführung fehlgeschlagen';
+            }
+        }
+        
+        // Event listeners for cost calculator
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'duration-input' || e.target.id === 'model-select') {
+                updateCostCalculation();
+            }
+        });
+        
+        console.log('🎨 Advanced Workflow Builder initialized');
+    </script>
+</body>
+</html>

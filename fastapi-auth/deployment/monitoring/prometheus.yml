@@ -1,0 +1,243 @@
+# ============================================================================
+# PHASE 6: Prometheus Configuration
+# Comprehensive monitoring setup for VoicePartnerAI
+# ============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'voicepartner-production'
+    replica: 'prometheus-1'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+
+  # VoicePartnerAI API
+  - job_name: 'voicepartner-api'
+    static_configs:
+      - targets: ['voicepartner-api:8005']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+  # Redis monitoring
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # Nginx monitoring
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-prometheus-exporter:9113']
+    scrape_interval: 30s
+
+  # Node/System monitoring
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # Docker container monitoring
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+
+  # Elasticsearch monitoring
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['elasticsearch-exporter:9114']
+    scrape_interval: 30s
+
+  # Custom application metrics from Redis
+  - job_name: 'voicepartner-custom-metrics'
+    static_configs:
+      - targets: ['voicepartner-api:8005']
+    metrics_path: '/api/monitoring/prometheus-metrics'
+    scrape_interval: 30s
+    basic_auth:
+      username: 'prometheus'
+      password: 'metrics-secret'
+
+  # Health checks
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://voicepartner-api:8005/health
+        - https://voicepartner.ai/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+# Recording rules for common queries
+recording_rules:
+  - name: voicepartner_api_rules
+    rules:
+      # Request rate (requests per second)
+      - record: voicepartner:request_rate
+        expr: rate(http_requests_total[5m])
+      
+      # Error rate percentage
+      - record: voicepartner:error_rate
+        expr: |
+          (
+            rate(http_requests_total{status=~"5.."}[5m]) /
+            rate(http_requests_total[5m])
+          ) * 100
+      
+      # Response time percentiles
+      - record: voicepartner:response_time_p95
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+      
+      - record: voicepartner:response_time_p99
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))
+      
+      # Active calls
+      - record: voicepartner:active_calls
+        expr: redis_calls_active_total
+      
+      # Provider health score
+      - record: voicepartner:provider_health_score
+        expr: avg_over_time(provider_health_score[10m])
+
+# Alerting rules
+alerting_rules:
+  - name: voicepartner_alerts
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: voicepartner:error_rate > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }}% for the last 2 minutes"
+      
+      # Critical error rate
+      - alert: CriticalErrorRate
+        expr: voicepartner:error_rate > 10
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Critical error rate detected"
+          description: "Error rate is {{ $value }}% for the last minute"
+      
+      # High response time
+      - alert: HighResponseTime
+        expr: voicepartner:response_time_p95 > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s"
+      
+      # Service down
+      - alert: ServiceDown
+        expr: up{job="voicepartner-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "VoicePartnerAI API is down"
+          description: "API service has been down for more than 1 minute"
+      
+      # Redis down
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis service has been down for more than 1 minute"
+      
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Available memory is below 10% ({{ $value }}%)"
+      
+      # High disk usage
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High disk usage"
+          description: "Available disk space is below 10% ({{ $value }}%)"
+      
+      # Too many active calls
+      - alert: TooManyActiveCalls
+        expr: voicepartner:active_calls > 100
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Too many active calls"
+          description: "Active calls count is {{ $value }}, exceeding threshold"
+      
+      # Provider unhealthy
+      - alert: ProviderUnhealthy
+        expr: voicepartner:provider_health_score < 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: providers
+        annotations:
+          summary: "Provider health degraded"
+          description: "Provider health score is {{ $value }}, below threshold"
+      
+      # Certificate expiration
+      - alert: CertificateExpiration
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+        for: 1h
+        labels:
+          severity: warning
+          component: ssl
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate will expire in {{ $value | humanizeDuration }}"

@@ -1,0 +1,22 @@
+{
+  "name": "Customer Support Agent",
+  "description": "Helpful customer support voice assistant",
+  "system_prompt": "You are a helpful customer support assistant. Be friendly, professional, and solve customer problems efficiently.",
+  "llm_provider": "openai",
+  "llm_model": "gpt-4",
+  "temperature": 0.7,
+  "max_tokens": 1000,
+  "voice_provider": "elevenlabs",
+  "voice_id": "21m00Tcm4TlvDq8ikWAM",
+  "voice_speed": 1.0,
+  "voice_pitch": 1.0,
+  "voice_stability": 0.75,
+  "language": "en",
+  "fallback_language": "en",
+  "first_message": "Hello! I'm your customer support assistant. How can I help you today?",
+  "interruption_sensitivity": "medium",
+  "silence_timeout": 3000,
+  "response_delay": 500,
+  "voicemail_detection": true,
+  "status": "active"
+}

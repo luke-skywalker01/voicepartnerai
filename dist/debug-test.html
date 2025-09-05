@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - VoicePartnerAI Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .debug-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #2563eb;
+        }
+        .success { color: #10b981; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔧 VoicePartnerAI Navigation Debug Test</h1>
+        <p>Dieser Test überprüft alle kritischen Funktionen der Platform systematisch.</p>
+        
+        <h3>🧪 Tests verfügbar:</h3>
+        <button class="test-btn" onclick="testDashboardLoad()">1. Dashboard Laden</button>
+        <button class="test-btn" onclick="testNavigation()">2. Navigation Testen</button>
+        <button class="test-btn" onclick="testAssistantCreation()">3. Assistant Creation</button>
+        <button class="test-btn" onclick="testWorkflowCreation()">4. Workflow Creation</button>
+        <button class="test-btn" onclick="testAPIs()">5. API Funktionen</button>
+        <button class="test-btn" onclick="runAllTests()">🚀 Alle Tests</button>
+        
+        <div id="testResults" class="debug-container"></div>
+    </div>
+
+    <script>
+        let results = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            
+            const resultDiv = document.getElementById('testResults');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.innerHTML = logEntry;
+            resultDiv.appendChild(logDiv);
+            
+            results.push({timestamp, message, type});
+        }
+
+        function testDashboardLoad() {
+            log('🔄 Testing Dashboard Load...', 'info');
+            
+            try {
+                // Test if we can access the main dashboard
+                fetch('/')
+                .then(response => {
+                    if (response.ok) {
+                        log('✅ Dashboard erreichbar', 'success');
+                        return response.text();
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .then(html => {
+                    log(`✅ Dashboard HTML geladen (${html.length} Zeichen)`, 'success');
+                })
+                .catch(error => {
+                    log(`❌ Dashboard Load Error: ${error.message}`, 'error');
+                });
+            } catch (error) {
+                log(`❌ Dashboard Load Exception: ${error.message}`, 'error');
+            }
+        }
+
+        function testNavigation() {
+            log('🔄 Testing Navigation System...', 'info');
+            
+            // Test if main dashboard can be loaded
+            window.open('/', '_blank', 'width=1200,height=800');
+            log('✅ Dashboard in neuem Fenster geöffnet - prüfe Navigation manuell', 'success');
+            
+            setTimeout(() => {
+                log('ℹ️  Bitte im neuen Dashboard-Fenster:', 'info');
+                log('   1. Auf "Assistants" in der Navbar klicken', 'info');
+                log('   2. Auf "Neuen Assistant erstellen" klicken', 'info');
+                log('   3. Prüfen ob Template-Modal erscheint', 'info');
+            }, 1000);
+        }
+
+        function testAssistantCreation() {
+            log('🔄 Testing Assistant Creation Flow...', 'info');
+            
+            // Test API endpoint directly
+            fetch('/api/assistants', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'Debug Test Assistant',
+                    description: 'Test assistant from debug',
+                    systemPrompt: 'You are a test assistant.',
+                    firstMessage: 'Hello from debug test!',
+                    voice: { provider: 'openai', voiceId: 'nova' },
+                    model: { provider: 'openai', model: 'gpt-4o' }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log(`✅ Assistant Creation API funktioniert: ${data.data.id}`, 'success');
+                } else {
+                    log(`❌ Assistant Creation API Error: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                log(`❌ Assistant Creation Exception: ${error.message}`, 'error');
+            });
+        }
+
+        function testWorkflowCreation() {
+            log('🔄 Testing Workflow Creation...', 'info');
+            
+            fetch('/api/workflows', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'Debug Test Workflow',
+                    description: 'Test workflow from debug',
+                    trigger: 'inbound_call',
+                    steps: []
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    log(`✅ Workflow Creation API funktioniert: ${data.data.id}`, 'success');
+                } else {
+                    log(`❌ Workflow Creation API Error: ${data.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                log(`❌ Workflow Creation Exception: ${error.message}`, 'error');
+            });
+        }
+
+        function testAPIs() {
+            log('🔄 Testing All API Endpoints...', 'info');
+            
+            const endpoints = [
+                '/api/health',
+                '/api/assistants',
+                '/api/workflows'
+            ];
+            
+            endpoints.forEach(endpoint => {
+                fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    log(`✅ ${endpoint} funktioniert`, 'success');
+                })
+                .catch(error => {
+                    log(`❌ ${endpoint} Error: ${error.message}`, 'error');
+                });
+            });
+        }
+
+        function runAllTests() {
+            log('🚀 Running Complete Test Suite...', 'info');
+            log('=' .repeat(50), 'info');
+            
+            testDashboardLoad();
+            setTimeout(testAPIs, 500);
+            setTimeout(testAssistantCreation, 1000);
+            setTimeout(testWorkflowCreation, 1500);
+            setTimeout(testNavigation, 2000);
+            
+            setTimeout(() => {
+                log('=' .repeat(50), 'info');
+                log('🏁 Test Suite Completed', 'success');
+                log(`📊 Ergebnisse: ${results.filter(r => r.type === 'success').length} Success, ${results.filter(r => r.type === 'error').length} Errors`, 'info');
+            }, 3000);
+        }
+
+        // Auto-run basic connectivity test on load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🎯 Debug Test System gestartet', 'success');
+            log('Server sollte auf http://localhost:3005 laufen', 'info');
+            
+            // Test server connectivity
+            setTimeout(testDashboardLoad, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vapi - Create Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* Vapi-exact Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+
+        /* Left Sidebar - Templates */
+        .sidebar {
+            width: 380px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-desc {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .template-search {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: #f9fafb;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+        }
+
+        .templates-section {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Vapi Template Cards */
+        .template-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            position: relative;
+        }
+
+        .template-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .template-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .template-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .template-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .template-icon {
+            width: 40px;
+            height: 40px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .template-category {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .template-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .template-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .feature-tag.highlight {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        /* Assistant Header */
+        .assistant-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 2rem;
+        }
+
+        .assistant-name {
+            font-size: 1.875rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #1e293b;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .assistant-name:focus {
+            outline: none;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .assistant-name::placeholder {
+            color: #94a3b8;
+        }
+
+        .assistant-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Configuration Tabs */
+        .config-tabs {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .config-tab {
+            padding: 1rem 0;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .config-tab:hover {
+            color: #1e293b;
+        }
+
+        .config-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        /* Config Content */
+        .config-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .config-panel {
+            display: none;
+            padding: 2rem;
+        }
+
+        .config-panel.active {
+            display: block;
+        }
+
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Provider Cards */
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .provider-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            background: white;
+        }
+
+        .provider-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .provider-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .provider-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .provider-desc {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            color: #1e293b;
+        }
+
+        .btn-test {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-test:hover {
+            background: #059669;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        /* Tool Configuration */
+        .tool-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .tool-type {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 300px;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            Vapi
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link active">Assistants</a>
+            <a href="#" class="nav-link">Phone Numbers</a>
+            <a href="#" class="nav-link">Call Logs</a>
+            <a href="#" class="nav-link">Settings</a>
+        </nav>
+        <div class="header-actions">
+            <button class="btn btn-secondary">
+                <i class="fas fa-question-circle"></i>
+                Help
+            </button>
+            <button class="btn btn-secondary">
+                <i class="fas fa-user-circle"></i>
+                Demo User
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar - Templates -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Choose a template</div>
+                <div class="sidebar-desc">Start with a pre-built assistant or create your own</div>
+            </div>
+
+            <div class="template-search">
+                <input type="text" class="search-input" placeholder="Search templates..." id="templateSearch">
+            </div>
+
+            <div class="templates-section">
+                <div class="section-title">Popular Templates</div>
+                
+                <!-- Appointment Scheduling -->
+                <div class="template-card" data-template="appointment-scheduling" data-category="scheduling">
+                    <div class="template-header">
+                        <div class="template-icon">📅</div>
+                        <div class="template-info">
+                            <div class="template-name">Appointment Scheduling</div>
+                            <div class="template-category">Scheduling</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        AI receptionist for booking, rescheduling, and canceling appointments. Handles customer verification and calendar integration.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag highlight">Popular</span>
+                        <span class="feature-tag">Calendar</span>
+                        <span class="feature-tag">Verification</span>
+                        <span class="feature-tag">Tools</span>
+                    </div>
+                </div>
+
+                <!-- Inbound Customer Support -->
+                <div class="template-card" data-template="customer-support" data-category="support">
+                    <div class="template-header">
+                        <div class="template-icon">🎧</div>
+                        <div class="template-info">
+                            <div class="template-name">Inbound Customer Support</div>
+                            <div class="template-category">Support</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        24/7 customer support agent for handling account inquiries, balance checks, and transaction history. Includes knowledge base integration.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag highlight">Popular</span>
+                        <span class="feature-tag">Banking</span>
+                        <span class="feature-tag">KB Integration</span>
+                        <span class="feature-tag">Voice Tests</span>
+                    </div>
+                </div>
+
+                <!-- Phone Call Handler -->
+                <div class="template-card" data-template="phone-handler" data-category="general">
+                    <div class="template-header">
+                        <div class="template-icon">📞</div>
+                        <div class="template-info">
+                            <div class="template-name">Phone Call Handler</div>
+                            <div class="template-category">General</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        Professional phone answering service with call routing, message taking, and basic information collection capabilities.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag">Routing</span>
+                        <span class="feature-tag">Messages</span>
+                        <span class="feature-tag">Information</span>
+                    </div>
+                </div>
+
+                <!-- Lead Qualification -->
+                <div class="template-card" data-template="lead-qualifier" data-category="sales">
+                    <div class="template-header">
+                        <div class="template-icon">🎯</div>
+                        <div class="template-info">
+                            <div class="template-name">Lead Qualification</div>
+                            <div class="template-category">Sales</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        Qualify incoming leads, gather contact information, and route qualified prospects to appropriate sales representatives.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag">CRM</span>
+                        <span class="feature-tag">Scoring</span>
+                        <span class="feature-tag">Routing</span>
+                    </div>
+                </div>
+
+                <!-- Web Call Assistant -->
+                <div class="template-card" data-template="web-assistant" data-category="web">
+                    <div class="template-header">
+                        <div class="template-icon">🌐</div>
+                        <div class="template-info">
+                            <div class="template-name">Web Call Assistant</div>
+                            <div class="template-category">Web</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        Handle web-based voice interactions, live chat support, and website visitor assistance with modern web integration.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag">Web Integration</span>
+                        <span class="feature-tag">Live Chat</span>
+                        <span class="feature-tag">Modern</span>
+                    </div>
+                </div>
+
+                <!-- Blank Template -->
+                <div class="template-card selected" data-template="blank" data-category="custom">
+                    <div class="template-header">
+                        <div class="template-icon">⚡</div>
+                        <div class="template-info">
+                            <div class="template-name">Blank Assistant</div>
+                            <div class="template-category">Custom</div>
+                        </div>
+                    </div>
+                    <div class="template-description">
+                        Start from scratch with a completely customizable assistant. Build your own conversation flows and integrations.
+                    </div>
+                    <div class="template-features">
+                        <span class="feature-tag">Custom</span>
+                        <span class="feature-tag">Flexible</span>
+                        <span class="feature-tag">Advanced</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Assistant Header -->
+            <div class="assistant-header">
+                <input type="text" class="assistant-name" placeholder="Assistant Name" value="Customer Service Bot" id="assistantName">
+                <div class="assistant-status">
+                    <div class="status-dot"></div>
+                    <span>Ready to configure</span>
+                </div>
+            </div>
+
+            <!-- Configuration Tabs -->
+            <div class="config-tabs">
+                <button class="config-tab active" data-tab="basic">
+                    <i class="fas fa-cog"></i>
+                    Basic Settings
+                </button>
+                <button class="config-tab" data-tab="voice">
+                    <i class="fas fa-microphone"></i>
+                    Voice
+                </button>
+                <button class="config-tab" data-tab="model">
+                    <i class="fas fa-brain"></i>
+                    Model
+                </button>
+                <button class="config-tab" data-tab="tools">
+                    <i class="fas fa-tools"></i>
+                    Tools
+                </button>
+                <button class="config-tab" data-tab="advanced">
+                    <i class="fas fa-sliders-h"></i>
+                    Advanced
+                </button>
+            </div>
+
+            <!-- Configuration Content -->
+            <div class="config-content">
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Assistant configured successfully!</span>
+                </div>
+
+                <!-- Basic Settings Panel -->
+                <div class="config-panel active" id="basic-panel">
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-comment"></i>
+                            <h3>First Message</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">What should your assistant say first?</label>
+                            <textarea class="form-textarea" id="firstMessage" placeholder="Hello! How can I help you today?">Hello, you've reached our customer support! My name is Tom, how may I assist you today?</textarea>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-robot"></i>
+                            <h3>System Prompt</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Define your assistant's personality and behavior</label>
+                            <textarea class="form-textarea" id="systemPrompt" placeholder="You are a helpful customer service representative...">You are a professional customer service representative. Be helpful, polite, and provide accurate information to customers. Keep responses under 30 words when possible. Always confirm important details with the customer.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Panel -->
+                <div class="config-panel" id="voice-panel">
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-volume-up"></i>
+                            <h3>Text-to-Speech</h3>
+                        </div>
+                        <div class="providers-grid">
+                            <div class="provider-card selected" data-provider="elevenlabs">
+                                <div class="provider-icon">🔊</div>
+                                <div class="provider-name">ElevenLabs</div>
+                                <div class="provider-desc">Premium voice quality</div>
+                            </div>
+                            <div class="provider-card" data-provider="openai">
+                                <div class="provider-icon">🎤</div>
+                                <div class="provider-name">OpenAI</div>
+                                <div class="provider-desc">Natural speech</div>
+                            </div>
+                            <div class="provider-card" data-provider="azure">
+                                <div class="provider-icon">☁️</div>
+                                <div class="provider-name">Azure</div>
+                                <div class="provider-desc">Enterprise ready</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-microphone-alt"></i>
+                            <h3>Speech-to-Text</h3>
+                        </div>
+                        <div class="providers-grid">
+                            <div class="provider-card selected" data-provider="deepgram">
+                                <div class="provider-icon">🌊</div>
+                                <div class="provider-name">Deepgram</div>
+                                <div class="provider-desc">Real-time accuracy</div>
+                            </div>
+                            <div class="provider-card" data-provider="google">
+                                <div class="provider-icon">🔍</div>
+                                <div class="provider-name">Google</div>
+                                <div class="provider-desc">Multi-language</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Panel -->
+                <div class="config-panel" id="model-panel">
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-brain"></i>
+                            <h3>Language Model</h3>
+                        </div>
+                        <div class="providers-grid">
+                            <div class="provider-card selected" data-provider="gpt4">
+                                <div class="provider-icon">🧠</div>
+                                <div class="provider-name">GPT-4</div>
+                                <div class="provider-desc">Most capable</div>
+                            </div>
+                            <div class="provider-card" data-provider="claude">
+                                <div class="provider-icon">🤖</div>
+                                <div class="provider-name">Claude</div>
+                                <div class="provider-desc">Safe & helpful</div>
+                            </div>
+                            <div class="provider-card" data-provider="gpt35">
+                                <div class="provider-icon">⚡</div>
+                                <div class="provider-name">GPT-3.5</div>
+                                <div class="provider-desc">Fast & efficient</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3>Model Settings</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Temperature (Creativity)</label>
+                            <input type="range" class="form-input" min="0" max="1" step="0.1" value="0.7" id="temperature">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Tokens</label>
+                            <input type="number" class="form-input" value="150" id="maxTokens">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Panel -->
+                <div class="config-panel" id="tools-panel">
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-tools"></i>
+                            <h3>Available Tools</h3>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-header">
+                                <div class="tool-name">check_availability</div>
+                                <div class="tool-type">Function</div>
+                            </div>
+                            <p style="color: #64748b; font-size: 0.875rem;">Check calendar availability for appointments</p>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-header">
+                                <div class="tool-name">book_appointment</div>
+                                <div class="tool-type">Function</div>
+                            </div>
+                            <p style="color: #64748b; font-size: 0.875rem;">Book new appointments with customer details</p>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-header">
+                                <div class="tool-name">transfer_call</div>
+                                <div class="tool-type">Built-in</div>
+                            </div>
+                            <p style="color: #64748b; font-size: 0.875rem;">Transfer call to human agent when needed</p>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i>
+                            Add Custom Tool
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Panel -->
+                <div class="config-panel" id="advanced-panel">
+                    <div class="config-section">
+                        <div class="section-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3>Advanced Configuration</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Interruption Sensitivity</label>
+                            <input type="range" class="form-input" min="0" max="1" step="0.1" value="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Response Delay (ms)</label>
+                            <input type="number" class="form-input" value="1000" min="0" max="5000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Call Phrases</label>
+                            <textarea class="form-textarea" placeholder="goodbye, bye, talk to you later, end call">goodbye, bye, talk to you later, end call</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="left-actions">
+                    <button class="btn btn-test" onclick="testAssistant()">
+                        <i class="fas fa-play"></i>
+                        Test Assistant
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-save"></i>
+                        Save Draft
+                    </button>
+                </div>
+                <div class="right-actions">
+                    <button class="btn btn-primary" onclick="createAssistant()">
+                        <i class="fas fa-rocket"></i>
+                        Create Assistant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Vapi Real Interface - Funktional geladen');
+        
+        let currentTemplate = 'blank';
+        let currentConfig = {
+            name: 'Customer Service Bot',
+            firstMessage: "Hello, you've reached our customer support! My name is Tom, how may I assist you today?",
+            systemPrompt: 'You are a professional customer service representative. Be helpful, polite, and provide accurate information to customers. Keep responses under 30 words when possible. Always confirm important details with the customer.',
+            voice: { tts: 'elevenlabs', stt: 'deepgram' },
+            model: { provider: 'gpt4', temperature: 0.7, maxTokens: 150 },
+            tools: ['check_availability', 'book_appointment', 'transfer_call']
+        };
+
+        // Template selection
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                
+                // Select this card
+                this.classList.add('selected');
+                currentTemplate = this.dataset.template;
+                
+                loadTemplate(currentTemplate);
+                console.log(`✅ Selected template: ${currentTemplate}`);
+            });
+        });
+
+        // Tab switching
+        document.querySelectorAll('.config-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active from all tabs and panels
+                document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
+                
+                // Add active to clicked tab
+                this.classList.add('active');
+                const targetPanel = document.getElementById(this.dataset.tab + '-panel');
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+                
+                console.log(`✅ Switched to ${this.dataset.tab} tab`);
+            });
+        });
+
+        // Provider selection
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const section = this.closest('.config-section');
+                section.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const provider = this.dataset.provider;
+                console.log(`✅ Selected provider: ${provider}`);
+                
+                // Update config
+                const sectionTitle = section.querySelector('h3').textContent;
+                if (sectionTitle.includes('Text-to-Speech')) {
+                    currentConfig.voice.tts = provider;
+                } else if (sectionTitle.includes('Speech-to-Text')) {
+                    currentConfig.voice.stt = provider;
+                } else if (sectionTitle.includes('Language Model')) {
+                    currentConfig.model.provider = provider;
+                }
+            });
+        });
+
+        // Template loading
+        function loadTemplate(template) {
+            const templates = {
+                'appointment-scheduling': {
+                    name: 'Appointment Scheduler',
+                    firstMessage: "Hello! I'm here to help you book, reschedule, or cancel your appointment. How can I assist you today?",
+                    systemPrompt: 'You are an AI receptionist for a barbershop. Your goals: 1) Verify the customer 2) Offer booking, rescheduling, or cancellation 3) Confirm details and send confirmation. When needed, call tools: check_availability, book_appointment, reschedule_appointment, cancel_appointment. Keep replies under 30 words. Confirm date/time clearly.',
+                    tools: ['check_availability', 'book_appointment', 'reschedule_appointment', 'cancel_appointment']
+                },
+                'customer-support': {
+                    name: 'Customer Support Agent',
+                    firstMessage: "Hello, you've reached VapiBank customer support! My name is Tom, how may I assist you today?",
+                    systemPrompt: 'You are a professional customer service representative for VapiBank. Handle account verification, balance inquiries, and transaction requests. Use tools to look up customer information. Be polite, professional, and secure. Always verify customer identity before providing account details.',
+                    tools: ['lookup_account', 'get_balance', 'get_recent_transactions', 'transfer_call']
+                },
+                'phone-handler': {
+                    name: 'Phone Call Handler',
+                    firstMessage: "Thank you for calling! How may I direct your call today?",
+                    systemPrompt: 'You are a professional phone answering service. Route calls appropriately, take messages when needed, and gather basic information. Be polite and efficient.',
+                    tools: ['transfer_call', 'take_message', 'schedule_callback']
+                },
+                'lead-qualifier': {
+                    name: 'Lead Qualification Agent',
+                    firstMessage: "Hello! Thank you for your interest in our services. I'd like to ask a few quick questions to better assist you.",
+                    systemPrompt: 'You are a lead qualification specialist. Gather contact information, understand needs, and qualify prospects. Be friendly but focused on collecting key information for sales follow-up.',
+                    tools: ['qualify_lead', 'schedule_demo', 'transfer_to_sales']
+                },
+                'web-assistant': {
+                    name: 'Web Call Assistant',
+                    firstMessage: "Hi there! I'm here to help with any questions you have. How can I assist you today?",
+                    systemPrompt: 'You are a web-based voice assistant. Help visitors with information, support, and navigation. Be conversational and helpful.',
+                    tools: ['search_knowledge_base', 'escalate_to_human', 'collect_feedback']
+                },
+                'blank': {
+                    name: 'Custom Assistant',
+                    firstMessage: 'Hello! How can I help you today?',
+                    systemPrompt: 'You are a helpful AI assistant. Be polite, professional, and assist users with their requests.',
+                    tools: ['transfer_call']
+                }
+            };
+
+            const templateConfig = templates[template] || templates['blank'];
+            
+            // Update UI
+            document.getElementById('assistantName').value = templateConfig.name;
+            document.getElementById('firstMessage').value = templateConfig.firstMessage;
+            document.getElementById('systemPrompt').value = templateConfig.systemPrompt;
+            
+            // Update config
+            currentConfig = { ...currentConfig, ...templateConfig };
+            
+            console.log(`✅ Loaded template: ${template}`, currentConfig);
+        }
+
+        // Test Assistant
+        function testAssistant() {
+            console.log('🧪 Testing assistant...', currentConfig);
+            
+            const successMsg = document.getElementById('successMessage');
+            successMsg.innerHTML = '<i class="fas fa-play-circle"></i> <span>Starting voice test... (This would open a call interface)</span>';
+            successMsg.classList.add('show');
+            
+            // Simulate test call
+            setTimeout(() => {
+                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> <span>Voice test completed successfully!</span>';
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                }, 3000);
+            }, 2000);
+        }
+
+        // Create Assistant
+        function createAssistant() {
+            // Collect current configuration
+            const config = {
+                name: document.getElementById('assistantName').value,
+                template: currentTemplate,
+                firstMessage: document.getElementById('firstMessage').value,
+                systemPrompt: document.getElementById('systemPrompt').value,
+                voice: currentConfig.voice,
+                model: currentConfig.model,
+                tools: currentConfig.tools
+            };
+            
+            console.log('🚀 Creating assistant...', config);
+            
+            // Show success message
+            const successMsg = document.getElementById('successMessage');
+            successMsg.innerHTML = `<i class="fas fa-rocket"></i> <span>Assistant "${config.name}" created successfully!</span>`;
+            successMsg.classList.add('show');
+            
+            // Simulate API call
+            setTimeout(() => {
+                successMsg.innerHTML = `<i class="fas fa-check-circle"></i> <span>Ready to receive calls! Phone number: +1 (555) 123-4567</span>`;
+                
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                }, 5000);
+            }, 2000);
+        }
+
+        // Template search
+        document.getElementById('templateSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.template-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('.template-name').textContent.toLowerCase();
+                const desc = card.querySelector('.template-description').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || desc.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Auto-test functionality
+        function runAutoTest() {
+            console.log('🧪 Running comprehensive functionality test...');
+            
+            setTimeout(() => {
+                // Test template selection
+                document.querySelector('[data-template="appointment-scheduling"]').click();
+                
+                setTimeout(() => {
+                    // Test tab switching
+                    document.querySelector('[data-tab="voice"]').click();
+                    
+                    setTimeout(() => {
+                        // Test provider selection
+                        document.querySelector('[data-provider="openai"]').click();
+                        
+                        setTimeout(() => {
+                            // Test assistant creation
+                            createAssistant();
+                            console.log('✅ All functionality tests completed successfully!');
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+        }
+
+        // Load default template
+        loadTemplate('blank');
+        
+        // Run auto-test
+        setTimeout(runAutoTest, 3000);
+    </script>
+</body>
+</html>

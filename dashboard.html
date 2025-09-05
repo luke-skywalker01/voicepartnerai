@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoicePartnerAI - Professional Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-accent: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 280px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif; 
+            background: var(--bg-secondary); 
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .user-avatar:hover {
+            background: #2563eb;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            padding: 0.5rem 0;
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .user-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: background 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--bg-accent);
+        }
+        
+        .dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        /* Burger Menu for Mobile */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .burger-line {
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+        
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .logo:hover {
+            color: #2563eb;
+        }
+        
+        /* Layout */
+        .app-container { display: flex; min-height: calc(100vh - 80px); }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+        }
+        
+        .nav-menu { padding: 0 1rem; }
+        .nav-section { margin-bottom: 2rem; }
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            padding: 0 1rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 0.25rem 0;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .nav-item i { width: 20px; text-align: center; font-size: 1.1rem; }
+        
+        /* Main Content */
+        .main { flex: 1; padding: 2rem; }
+        .content-section { 
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out; 
+        }
+        .content-section.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page-header { margin-bottom: 2rem; }
+        .page-title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .page-subtitle { 
+            font-size: 1.1rem; 
+            color: var(--text-secondary);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-title {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .stat-icon.calls { background: #dbeafe; color: var(--primary-color); }
+        .stat-icon.success { background: #dcfce7; color: var(--success-color); }
+        .stat-icon.revenue { background: #fef3c7; color: var(--warning-color); }
+        .stat-icon.agents { background: #f3e8ff; color: #8b5cf6; }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive { color: var(--success-color); }
+        .stat-change.negative { color: var(--danger-color); }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-top: 2px solid #333;
+        }
+        
+        .debug-controls {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .debug-btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 3px;
+        }
+        
+        .debug-btn:hover { background: #555; }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .action-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+        
+        .action-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: var(--bg-primary);
+            margin: 5% auto;
+            padding: 0;
+            border: none;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-accent);
+        }
+        
+        /* Vapi-style Table */
+        .vapi-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .vapi-table thead {
+            background: var(--bg-accent);
+        }
+        
+        .vapi-table th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .vapi-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .vapi-table tbody tr:hover {
+            background: var(--bg-accent);
+        }
+        
+        .vapi-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .table-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.1);
+            color: rgb(34, 197, 94);
+        }
+        
+        .status-badge.inactive {
+            background: rgba(245, 158, 11, 0.1);
+            color: rgb(245, 158, 11);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+        }
+        
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #2563eb;
+        }
+        
+        /* Advanced Workflow Connection System */
+        .workflow-node {
+            user-select: none;
+            position: relative;
+        }
+        
+        .node-connector {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 2px solid white;
+            cursor: crosshair;
+            z-index: 20;
+        }
+        
+        .node-connector.input {
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .node-connector.output {
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .node-connector:hover {
+            background: #1d4ed8;
+            transform: translateY(-50%) scale(1.2);
+        }
+        
+        .workflow-connection {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .connection-line {
+            stroke: #3b82f6;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        
+        .connection-line.active {
+            stroke: #10b981;
+            stroke-width: 3;
+        }
+        
+        .connection-temp {
+            stroke: #f59e0b;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5,5;
+        }
+        
+        .workflow-canvas {
+            position: relative;
+            overflow: visible;
+        }
+        
+        .workflow-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes connectionFlow {
+            0% { stroke-dashoffset: 10; }
+            100% { stroke-dashoffset: 0; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .burger-menu { display: flex; }
+            .app-container { flex-direction: column; }
+            .sidebar { 
+                position: fixed;
+                left: -280px;
+                top: 80px;
+                height: calc(100vh - 80px);
+                width: var(--sidebar-width);
+                transition: left 0.3s ease;
+                z-index: 200;
+                box-shadow: var(--shadow-md);
+            }
+            .sidebar.show { left: 0; }
+            .main { 
+                padding: 1rem;
+                margin-left: 0;
+            }
+            .stats-grid { grid-template-columns: 1fr; }
+            
+            .vapi-table {
+                font-size: 0.85rem;
+            }
+            
+            .vapi-table th,
+            .vapi-table td {
+                padding: 0.75rem 1rem;
+            }
+            
+            .workflow-toolbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .page-header > div {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <i class="fas fa-microphone"></i>
+            VoicePartnerAI
+        </div>
+        
+        <div class="header-right">
+            <div class="burger-menu" onclick="toggleSidebar()">
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+            </div>
+            
+            <div class="user-menu">
+                <div class="user-avatar" onclick="toggleUserMenu()">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user-circle"></i>
+                        Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-key"></i>
+                        API Keys
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Voice AI</div>
+                    <div class="nav-item" data-section="assistants">
+                        <i class="fas fa-robot"></i>
+                        <span>Assistants</span>
+                    </div>
+                    <div class="nav-item" data-section="squads">
+                        <i class="fas fa-users"></i>
+                        <span>Squads</span>
+                    </div>
+                    <div class="nav-item" data-section="workflows">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Workflows</span>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Communication</div>
+                    <div class="nav-item" data-section="calls">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Calls</span>
+                    </div>
+                    <div class="nav-item" data-section="phone-numbers">
+                        <i class="fas fa-hashtag"></i>
+                        <span>Phone Numbers</span>
+                    </div>
+                    <div class="nav-item" data-section="campaigns">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Campaigns</span>
+                    </div>
+                    <div class="nav-item" data-section="chat">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <div class="nav-item" data-section="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="nav-item" data-section="webhooks">
+                        <i class="fas fa-code"></i>
+                        <span>Webhooks</span>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <div class="nav-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Einstellungen</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <main class="main">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section active">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Übersicht über deine Voice AI Agenten und Performance</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Anrufe heute</div>
+                            <div class="stat-icon calls">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +12% vs gestern
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Erfolgreiche Gespräche</div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">98.5%</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +2.1% vs gestern
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Umsatz heute</div>
+                            <div class="stat-icon revenue">
+                                <i class="fas fa-euro-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">€2,847</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +18% vs gestern
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Aktive Agents</div>
+                            <div class="stat-icon agents">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +3 diese Woche
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Schnellaktionen</h3>
+                    <div class="quick-actions">
+                        <div class="action-card" data-section="assistants">
+                            <div class="action-header">
+                                <div class="action-icon" style="background: var(--primary-color);">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <div class="action-title">Neuer Assistant</div>
+                                    <div class="action-desc">Erstelle einen AI-Agent mit Prompt</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-card" data-section="workflows">
+                            <div class="action-header">
+                                <div class="action-icon" style="background: #8b5cf6;">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div>
+                                    <div class="action-title">Neuer Workflow</div>
+                                    <div class="action-desc">Visuelle Logik mit Drag & Drop</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assistants Section -->
+            <div id="assistants-section" class="content-section">
+                <div class="page-header">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 class="page-title">Assistants</h1>
+                            <p class="page-subtitle">Create and manage your voice AI assistants</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openAssistantModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Assistant
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 0;">
+                    <table class="vapi-table" id="assistants-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Model</th>
+                                <th>Voice</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assistants-tbody">
+                            <!-- Assistants will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Workflows Section -->
+            <div id="workflows-section" class="content-section">
+                <div class="page-header">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 class="page-title">Workflows</h1>
+                            <p class="page-subtitle">Design complex conversation flows</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openWorkflowBuilder()">
+                            <i class="fas fa-plus"></i>
+                            Create Workflow
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Workflow Canvas -->
+                <div class="card" style="padding: 0; min-height: 500px; position: relative; background: #fafafa;">
+                    <div class="workflow-toolbar" style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); background: white; display: flex; gap: 1rem; align-items: center;">
+                        <button class="action-btn" onclick="addNode('start')">
+                            <i class="fas fa-play"></i>
+                            Start
+                        </button>
+                        <button class="action-btn" onclick="addNode('message')">
+                            <i class="fas fa-comment"></i>
+                            Message
+                        </button>
+                        <button class="action-btn" onclick="addNode('condition')">
+                            <i class="fas fa-code-branch"></i>
+                            Condition
+                        </button>
+                        <button class="action-btn" onclick="addNode('api')">
+                            <i class="fas fa-plug"></i>
+                            API Call
+                        </button>
+                        <button class="action-btn" onclick="addNode('transfer')">
+                            <i class="fas fa-phone-alt"></i>
+                            Transfer
+                        </button>
+                        <button class="action-btn" onclick="addNode('end')">
+                            <i class="fas fa-stop"></i>
+                            End Call
+                        </button>
+                        <div style="margin-left: auto;">
+                            <button class="btn btn-secondary" onclick="clearCanvas()">
+                                <i class="fas fa-trash"></i>
+                                Clear
+                            </button>
+                            <button class="btn btn-primary" onclick="saveWorkflow()">
+                                <i class="fas fa-save"></i>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="workflow-canvas" class="workflow-canvas" style="padding: 2rem; min-height: 400px; position: relative; background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSIxIiBjeT0iMSIgcj0iMSIgZmlsbD0iI2U1ZTdlYiIgZmlsbC1vcGFjaXR5PSIwLjQiLz4KICA8L3N2Zz4K') repeat;">
+                        <div id="workflow-nodes"></div>
+                        
+                        <!-- Empty State -->
+                        <div id="workflow-empty" class="workflow-empty" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <div style="width: 120px; height: 120px; border-radius: 50%; background: white; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <i class="fas fa-project-diagram" style="font-size: 2rem; color: var(--text-secondary);"></i>
+                            </div>
+                            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Build Your First Workflow</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Start by adding nodes from the toolbar above</p>
+                            <button class="btn btn-primary" onclick="addNode('start')">
+                                <i class="fas fa-play"></i>
+                                Add Start Node
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calls Section -->
+            <div id="calls-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Calls</h1>
+                    <p class="page-subtitle">Monitor live calls and view call history</p>
+                </div>
+                
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Active Calls</div>
+                            <div class="stat-icon calls">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-pulse"></i>
+                            Live now
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Today's Calls</div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">147</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +23% vs yesterday
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Avg Duration</div>
+                            <div class="stat-icon" style="background: #f3e8ff; color: #8b5cf6;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">4:32</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +45s vs yesterday
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Success Rate</div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">94.2%</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +2.1% vs yesterday
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 0;">
+                    <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0;">Call History</h3>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">Recent calls and live monitoring</p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="action-btn" onclick="refreshCalls()">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                            <button class="action-btn" onclick="exportCalls()">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <table class="vapi-table" id="calls-table" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Assistant</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calls-tbody">
+                            <!-- Calls will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Analytics</h1>
+                    <p class="page-subtitle">Performance Metriken und Insights</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Performance Dashboard</h3>
+                    <p>Detaillierte Analysen der Voice Agent Performance.</p>
+                </div>
+            </div>
+            
+            <!-- Squads Section -->
+            <div id="squads-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Squads</h1>
+                    <p class="page-subtitle">Multi-Assistant Teams und Orchestrierung</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Squad Management</h3>
+                    <p>Erstelle Teams aus mehreren Assistants für komplexe Workflows.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i>
+                        Neues Squad erstellen
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Phone Numbers Section -->
+            <div id="phone-numbers-section" class="content-section">
+                <div class="page-header">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 class="page-title">Phone Numbers</h1>
+                            <p class="page-subtitle">Buy and configure phone numbers for your assistants</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="buyPhoneNumber()">
+                            <i class="fas fa-plus"></i>
+                            Buy Number
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 0;">
+                    <table class="vapi-table" id="phone-numbers-table">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Country</th>
+                                <th>Assistant</th>
+                                <th>Status</th>
+                                <th>Monthly Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="phone-numbers-tbody">
+                            <!-- Phone numbers will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Campaigns Section -->
+            <div id="campaigns-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Campaigns</h1>
+                    <p class="page-subtitle">Outbound-Kampagnen und Bulk-Anrufe</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Kampagnen Management</h3>
+                    <p>Erstelle und verwalte automatisierte Outbound-Anrufkampagnen.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i>
+                        Neue Kampagne
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Chat Section -->
+            <div id="chat-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Chat</h1>
+                    <p class="page-subtitle">Web-Chat Integration und Management</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Chat Interface</h3>
+                    <p>Integriere Voice AI in Web-Chat und Chat-Anwendungen.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i>
+                        Chat Widget einrichten
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Webhooks Section -->
+            <div id="webhooks-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Webhooks</h1>
+                    <p class="page-subtitle">Event-Benachrichtigungen und Integrationen</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Webhook Konfiguration</h3>
+                    <p>Konfiguriere Webhooks für Echtzeit-Benachrichtigungen und Integrationen.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i>
+                        Webhook hinzufügen
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Settings</h1>
+                    <p class="page-subtitle">System- und Account-Konfiguration</p>
+                </div>
+                
+                <div class="card">
+                    <h3>API Konfiguration</h3>
+                    <p>API-Schlüssel, Webhooks und Integrationen verwalten.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-key"></i>
+                        API Keys verwalten
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Node Configuration Modal -->
+    <div id="nodeConfigModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="nodeConfigTitle">Configure Node</h2>
+                <button class="modal-close" onclick="closeNodeConfigModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="nodeConfigContent">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeNodeConfigModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveNodeConfiguration()">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assistant Modal -->
+    <div id="assistantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Assistant</h2>
+                <button class="modal-close" onclick="closeAssistantModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="assistantForm">
+                    <div class="form-group">
+                        <label class="form-label" for="assistantName">Name *</label>
+                        <input type="text" id="assistantName" class="form-input" placeholder="Enter assistant name" required>
+                        <div class="form-help">Give your assistant a unique name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="systemPrompt">System Prompt *</label>
+                        <textarea id="systemPrompt" class="form-textarea" placeholder="Sie sind ein freundlicher Kundensupport-Assistent für deutsche Kunden. Begrüßen Sie den Anrufer und bieten Sie Hilfe an. Halten Sie Antworten unter 30 Wörtern." required rows="6"></textarea>
+                        <div class="form-help">Definieren Sie das Verhalten und die Persönlichkeit Ihres Assistenten. Antworten unter 30 Wörtern halten.</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="voiceProvider">Sprach-Anbieter</label>
+                            <select id="voiceProvider" class="form-select" onchange="updateVoiceOptions()">
+                                <option value="openai">OpenAI</option>
+                                <option value="elevenlabs">ElevenLabs</option>
+                                <option value="playht">PlayHT</option>
+                                <option value="azure">Azure Cognitive Services</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="voiceId">Stimme</label>
+                            <select id="voiceId" class="form-select">
+                                <option value="alloy">Alloy (Neutral)</option>
+                                <option value="echo">Echo (Männlich)</option>
+                                <option value="fable">Fable (Britisch)</option>
+                                <option value="onyx">Onyx (Tief)</option>
+                                <option value="nova">Nova (Weiblich)</option>
+                                <option value="shimmer">Shimmer (Freundlich)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="model">Sprachmodell</label>
+                            <select id="model" class="form-select">
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                                <option value="claude-3-opus">Claude 3 Opus</option>
+                                <option value="gemini-pro">Gemini Pro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="language">Sprache</label>
+                            <select id="language" class="form-select">
+                                <option value="de-DE">Deutsch</option>
+                                <option value="en-US">English (US)</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="fr-FR">Français</option>
+                                <option value="es-ES">Español</option>
+                                <option value="it-IT">Italiano</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="firstMessage">Erste Nachricht</label>
+                        <input type="text" id="firstMessage" class="form-input" placeholder="Hallo! Wie kann ich Ihnen heute helfen?">
+                        <div class="form-help">Die erste Nachricht, die Ihr Assistent sagen wird</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Erweiterte Einstellungen</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                            <div>
+                                <label class="form-label" for="maxDuration">Max. Gesprächsdauer (Minuten)</label>
+                                <input type="number" id="maxDuration" class="form-input" value="30" min="1" max="60">
+                            </div>
+                            <div>
+                                <label class="form-label" for="silenceTimeout">Stille-Timeout (Sekunden)</label>
+                                <input type="number" id="silenceTimeout" class="form-input" value="10" min="5" max="30">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tools & Funktionen</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="enableTranscription" checked>
+                                <span>Transkription aktivieren</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="enableRecording">
+                                <span>Aufzeichnung aktivieren</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="enableSentimentAnalysis">
+                                <span>Sentiment-Analyse</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="enableCallTransfer">
+                                <span>Anruf-Weiterleitung</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAssistantModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createAssistant()">Create Assistant</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+        <div class="debug-controls">
+            <button class="debug-btn" onclick="testNavigation()">🧪 Test All</button>
+            <button class="debug-btn" onclick="clearDebugLog()">🗑️ Clear</button>
+            <button class="debug-btn" onclick="navigateToSection('dashboard')">→ Dashboard</button>
+            <button class="debug-btn" onclick="navigateToSection('assistants')">→ Assistants</button>
+            <button class="debug-btn" onclick="navigateToSection('workflows')">→ Workflows</button>
+            <button class="debug-btn" onclick="navigateToSection('calls')">→ Calls</button>
+            <button class="debug-btn" onclick="navigateToSection('squads')">→ Squads</button>
+            <button class="debug-btn" onclick="navigateToSection('phone-numbers')">→ Phone Numbers</button>
+            <button class="debug-btn" onclick="navigateToSection('campaigns')">→ Campaigns</button>
+            <button class="debug-btn" onclick="navigateToSection('chat')">→ Chat</button>
+            <button class="debug-btn" onclick="navigateToSection('webhooks')">→ Webhooks</button>
+        </div>
+        <div id="debug-log">🔧 PROFESSIONAL NAVIGATION SYSTEM LOADED</div>
+    </div>
+    
+    <script>
+        // Debug logging
+        function debugLog(message) {
+            const log = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<br>[${timestamp}] ${message}`;
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearDebugLog() {
+            document.getElementById('debug-log').innerHTML = '🔧 DEBUG LOG CLEARED';
+        }
+        
+        // Main navigation function
+        function navigateToSection(sectionName) {
+            debugLog(`🚀 Navigating to: ${sectionName}`);
+            
+            try {
+                // Hide all sections
+                const allSections = document.querySelectorAll('.content-section');
+                debugLog(`📋 Found ${allSections.length} sections`);
+                
+                allSections.forEach(section => {
+                    section.classList.remove('active');
+                    section.style.display = 'none';
+                    debugLog(`🔒 Hidden: ${section.id}`);
+                });
+                
+                // Show target section
+                const targetSection = document.getElementById(sectionName + '-section');
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    targetSection.style.display = 'block';
+                    debugLog(`✅ Shown: ${sectionName}-section`);
+                } else {
+                    debugLog(`❌ Section not found: ${sectionName}-section`);
+                    return;
+                }
+                
+                // Update navigation
+                const allNavItems = document.querySelectorAll('.nav-item');
+                allNavItems.forEach(item => item.classList.remove('active'));
+                
+                const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
+                if (activeNavItem) {
+                    activeNavItem.classList.add('active');
+                    debugLog(`✅ Nav updated for: ${sectionName}`);
+                }
+                
+                debugLog(`✅ Navigation to ${sectionName} COMPLETE`);
+                
+            } catch (error) {
+                debugLog(`❌ Navigation ERROR: ${error.message}`);
+            }
+        }
+        
+        // Test function
+        function testNavigation() {
+            debugLog('🧪 Running navigation test sequence...');
+            const sections = ['dashboard', 'assistants', 'squads', 'workflows', 'calls', 'phone-numbers', 'campaigns', 'chat', 'analytics', 'webhooks', 'settings'];
+            
+            sections.forEach((section, index) => {
+                setTimeout(() => {
+                    navigateToSection(section);
+                }, index * 1000);
+            });
+            
+            setTimeout(() => {
+                navigateToSection('dashboard');
+                debugLog('🎯 Navigation test COMPLETE - returned to dashboard');
+            }, sections.length * 1000);
+        }
+        
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🔄 DOM loaded, initializing navigation...');
+            
+            // Add click event listeners to nav items
+            const navItems = document.querySelectorAll('.nav-item[data-section]');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    navigateToSection(section);
+                });
+            });
+            
+            // Add click event listeners to action cards
+            const actionCards = document.querySelectorAll('.action-card[data-section]');
+            actionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    navigateToSection(section);
+                });
+            });
+            
+            debugLog(`✅ Event listeners added to ${navItems.length} nav items and ${actionCards.length} action cards`);
+            debugLog('🎯 Navigation system ready - click any nav item or use debug buttons');
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.user-menu')) {
+                    document.getElementById('userDropdown').classList.remove('show');
+                }
+                
+                if (!event.target.closest('.sidebar') && !event.target.closest('.burger-menu')) {
+                    document.querySelector('.sidebar')?.classList.remove('show');
+                }
+            });
+        });
+        
+        // User menu functions
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const burger = document.querySelector('.burger-menu');
+            sidebar.classList.toggle('show');
+            burger.classList.toggle('active');
+        }
+        
+        function logout() {
+            debugLog('🚪 Logout function called');
+            if (confirm('Sind Sie sicher, dass Sie sich abmelden möchten?')) {
+                debugLog('✅ User confirmed logout - redirecting to index.html');
+                window.location.href = 'index.html';
+            } else {
+                debugLog('❌ User cancelled logout');
+            }
+        }
+        
+        // Assistant Management Functions
+        let assistants = [
+            {
+                id: '1',
+                name: 'Customer Support',
+                systemPrompt: 'You are a friendly customer support assistant.',
+                status: 'active',
+                voice: 'alloy',
+                model: 'gpt-3.5-turbo',
+                createdAt: new Date().toLocaleDateString()
+            },
+            {
+                id: '2', 
+                name: 'Sales Assistant',
+                systemPrompt: 'You are a helpful sales assistant.',
+                status: 'inactive',
+                voice: 'nova',
+                model: 'gpt-4',
+                createdAt: new Date().toLocaleDateString()
+            }
+        ];
+        
+        function openAssistantModal() {
+            debugLog('📝 Opening Assistant Creation Modal');
+            document.getElementById('assistantModal').style.display = 'block';
+        }
+        
+        function closeAssistantModal() {
+            debugLog('❌ Closing Assistant Modal');
+            document.getElementById('assistantModal').style.display = 'none';
+            document.getElementById('assistantForm').reset();
+        }
+        
+        async function createAssistant() {
+            const name = document.getElementById('assistantName').value;
+            const systemPrompt = document.getElementById('systemPrompt').value;
+            const voice = document.getElementById('voiceId').value;
+            const model = document.getElementById('model').value;
+            const firstMessage = document.getElementById('firstMessage').value;
+            
+            if (!name || !systemPrompt) {
+                showToast('Bitte füllen Sie alle Pflichtfelder aus', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const createBtn = event.target;
+            const originalText = createBtn.innerHTML;
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            createBtn.disabled = true;
+            
+            try {
+                const newAssistant = {
+                    id: Date.now().toString(),
+                    name: name,
+                    systemPrompt: systemPrompt,
+                    status: 'active',
+                    voice: voice,
+                    model: model,
+                    firstMessage: firstMessage,
+                    createdAt: new Date().toLocaleDateString()
+                };
+                
+                // Use VoicePartnerAI SDK
+                const result = await vpaiSDK.createAssistant(newAssistant);
+                
+                if (result.success) {
+                    assistants.push(result.assistant);
+                    saveToStorage(STORAGE_KEYS.assistants, assistants);
+                    
+                    debugLog(`✅ Created assistant: ${name}`);
+                    renderAssistants();
+                    closeAssistantModal();
+                    showToast(`Assistant "${name}" erfolgreich erstellt!`, 'success');
+                } else {
+                    throw new Error(result.error || 'Assistant creation failed');
+                }
+            } catch (error) {
+                debugLog(`❌ Assistant creation error: ${error.message}`);
+                showToast('Fehler beim Erstellen des Assistants', 'error');
+            } finally {
+                createBtn.innerHTML = originalText;
+                createBtn.disabled = false;
+            }
+        }
+        
+        function renderAssistants() {
+            const tbody = document.getElementById('assistants-tbody');
+            
+            tbody.innerHTML = assistants.map(assistant => `
+                <tr>
+                    <td>
+                        <div class="table-name">${assistant.name}</div>
+                        <div class="table-meta">${assistant.systemPrompt.substring(0, 60)}...</div>
+                    </td>
+                    <td>
+                        <span class="table-meta">${assistant.model}</span>
+                    </td>
+                    <td>
+                        <span class="table-meta">${assistant.voice}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${assistant.status}">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                            ${assistant.status}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="table-meta">${assistant.createdAt}</span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn primary" onclick="testAssistant('${assistant.id}')" title="Test">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="action-btn" onclick="editAssistant('${assistant.id}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="duplicateAssistant('${assistant.id}')" title="Duplicate">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteAssistant('${assistant.id}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function testAssistant(id) {
+            const assistant = assistants.find(a => a.id === id);
+            debugLog(`🧪 Testing assistant: ${assistant.name}`);
+            
+            showToast(`Testing "${assistant.name}"...`, 'info');
+            
+            try {
+                const testResult = await vpaiSDK.testAssistant(id);
+                
+                if (testResult.success) {
+                    const { testCall, metrics } = testResult;
+                    
+                    debugLog(`✅ Test completed: ${testCall.duration}, ${testCall.accuracy} accuracy`);
+                    showToast(`Test erfolgreich! Dauer: ${testCall.duration}, Latenz: ${testCall.latency}`, 'success');
+                    
+                    // Show detailed test results
+                    const details = `
+                        🎤 Test Call Ergebnisse:\n
+                        • Dauer: ${testCall.duration}
+                        • Status: ${testCall.status}
+                        • Latenz: ${testCall.latency}
+                        • Genauigkeit: ${testCall.accuracy}
+                        • Sprache: ${metrics.languageDetection}
+                        • Qualität: ${metrics.speechQuality}
+                        
+                        Transcript: "${testCall.transcript}"
+                    `;
+                    
+                    if (confirm(details + '\n\nMöchten Sie diesen Assistant deployen?')) {
+                        showToast('Deployment wird vorbereitet...', 'info');
+                    }
+                } else {
+                    throw new Error('Test failed');
+                }
+            } catch (error) {
+                debugLog(`❌ Test error: ${error.message}`);
+                showToast('Test fehlgeschlagen - bitte versuchen Sie es erneut', 'error');
+            }
+        }
+        
+        function editAssistant(id) {
+            const assistant = assistants.find(a => a.id === id);
+            debugLog(`✏️ Editing assistant: ${assistant.name}`);
+            // Pre-fill form with existing data and open modal
+            document.getElementById('assistantName').value = assistant.name;
+            document.getElementById('systemPrompt').value = assistant.systemPrompt;
+            document.getElementById('voiceId').value = assistant.voice;
+            document.getElementById('model').value = assistant.model;
+            document.getElementById('firstMessage').value = assistant.firstMessage || '';
+            openAssistantModal();
+        }
+        
+        function duplicateAssistant(id) {
+            const assistant = assistants.find(a => a.id === id);
+            const duplicate = {
+                ...assistant,
+                id: Date.now().toString(),
+                name: `${assistant.name} (Copy)`,
+                createdAt: new Date().toLocaleDateString()
+            };
+            assistants.push(duplicate);
+            debugLog(`📋 Duplicated assistant: ${assistant.name}`);
+            renderAssistants();
+            showToast('Assistant duplicated', 'success');
+        }
+        
+        function deleteAssistant(id) {
+            const assistant = assistants.find(a => a.id === id);
+            if (confirm(`Are you sure you want to delete ${assistant.name}?`)) {
+                assistants = assistants.filter(a => a.id !== id);
+                debugLog(`🗑️ Deleted assistant: ${assistant.name}`);
+                renderAssistants();
+                showToast('Assistant deleted', 'success');
+            }
+        }
+        
+        // Sample data
+        let phoneNumbers = [
+            { id: '1', number: '+1 (555) 123-4567', country: 'US', status: 'active', assistant: 'Customer Support' },
+            { id: '2', number: '+1 (555) 987-6543', country: 'US', status: 'active', assistant: 'Sales Assistant' },
+            { id: '3', number: '+49 30 12345678', country: 'DE', status: 'inactive', assistant: null }
+        ];
+        
+        let calls = [
+            { id: '1', from: '+1 (555) 111-2222', to: '+1 (555) 123-4567', assistant: 'Customer Support', status: 'completed', duration: '3:45', time: '2 mins ago' },
+            { id: '2', from: '+1 (555) 333-4444', to: '+1 (555) 987-6543', assistant: 'Sales Assistant', status: 'active', duration: '1:23', time: 'Now' },
+            { id: '3', from: '+1 (555) 555-6666', to: '+1 (555) 123-4567', assistant: 'Customer Support', status: 'failed', duration: '0:15', time: '5 mins ago' }
+        ];
+        
+        // Advanced Workflow Builder Functions
+        let workflowNodes = [];
+        let workflowConnections = [];
+        let nodeCounter = 0;
+        let isConnecting = false;
+        let connectionStart = null;
+        let tempConnection = null;
+        
+        function openWorkflowBuilder() {
+            debugLog('🛠️ Opening Workflow Builder');
+            showToast('Workflow Builder ready!', 'info');
+        }
+        
+        function addNode(type) {
+            nodeCounter++;
+            const node = {
+                id: `node-${nodeCounter}`,
+                type: type,
+                x: Math.random() * 400 + 100,
+                y: Math.random() * 200 + 100,
+                name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${nodeCounter}`
+            };
+            
+            workflowNodes.push(node);
+            renderWorkflowNodes();
+            hideEmptyState();
+            debugLog(`➕ Added ${type} node`);
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} node added`, 'success');
+        }
+        
+        function renderWorkflowNodes() {
+            const container = document.getElementById('workflow-nodes');
+            
+            container.innerHTML = `
+                <svg class="workflow-svg" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+                        </marker>
+                    </defs>
+                    ${renderConnections()}
+                </svg>
+            ` + workflowNodes.map(node => {
+                const nodeColors = {
+                    start: '#22c55e',
+                    message: '#3b82f6', 
+                    condition: '#f59e0b',
+                    api: '#8b5cf6',
+                    transfer: '#ef4444',
+                    end: '#64748b'
+                };
+                
+                return `
+                    <div class="workflow-node" id="${node.id}" style="
+                        position: absolute;
+                        left: ${node.x}px;
+                        top: ${node.y}px;
+                        background: white;
+                        border: 2px solid ${nodeColors[node.type]};
+                        border-radius: 12px;
+                        padding: 1rem;
+                        min-width: 150px;
+                        box-shadow: var(--shadow-sm);
+                        cursor: move;
+                        z-index: 10;
+                    " onmousedown="startDrag('${node.id}', event)">
+                        ${node.type !== 'start' ? `<div class="node-connector input" onclick="startConnection('${node.id}', 'input', event)"></div>` : ''}
+                        ${node.type !== 'end' ? `<div class="node-connector output" onclick="startConnection('${node.id}', 'output', event)"></div>` : ''}
+                        
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: ${nodeColors[node.type]};"></div>
+                            <strong style="font-size: 0.9rem;">${node.name}</strong>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            ${getNodeDescription(node.type)}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                            <button class="action-btn" onclick="configureNode('${node.id}')" style="font-size: 0.8rem;">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteNode('${node.id}')" style="font-size: 0.8rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getNodeDescription(type) {
+            const descriptions = {
+                start: 'Entry point',
+                message: 'Send message',
+                condition: 'Branch logic',
+                api: 'External call',
+                transfer: 'Human handoff',
+                end: 'Terminate call'
+            };
+            return descriptions[type] || 'Custom node';
+        }
+        
+        function hideEmptyState() {
+            const emptyState = document.getElementById('workflow-empty');
+            if (emptyState) emptyState.style.display = 'none';
+        }
+        
+        function clearCanvas() {
+            if (confirm('Clear all nodes from the canvas?')) {
+                workflowNodes = [];
+                nodeCounter = 0;
+                document.getElementById('workflow-nodes').innerHTML = '';
+                document.getElementById('workflow-empty').style.display = 'block';
+                debugLog('🗑️ Cleared workflow canvas');
+                showToast('Canvas cleared', 'info');
+            }
+        }
+        
+        async function saveWorkflow() {
+            if (workflowNodes.length === 0) {
+                showToast('Keine Nodes zum Speichern vorhanden', 'error');
+                return;
+            }
+            
+            const workflowData = {
+                id: `workflow_${Date.now()}`,
+                name: `Workflow ${new Date().toLocaleString('de-DE')}`,
+                nodes: workflowNodes,
+                connections: workflowConnections,
+                createdAt: new Date().toISOString(),
+                status: 'draft'
+            };
+            
+            debugLog('💾 Saving workflow to VoicePartnerAI...');
+            showToast('Workflow wird gespeichert...', 'info');
+            
+            try {
+                const result = await vpaiSDK.saveWorkflow(workflowData);
+                
+                if (result.success) {
+                    // Save to local storage
+                    const workflows = loadFromStorage(STORAGE_KEYS.workflows, []);
+                    workflows.push(workflowData);
+                    saveToStorage(STORAGE_KEYS.workflows, workflows);
+                    
+                    debugLog(`✅ Workflow saved: ${result.workflowId}`);
+                    showToast('Workflow erfolgreich gespeichert!', 'success');
+                    
+                    // Ask for deployment
+                    if (confirm('Workflow gespeichert! Möchten Sie es jetzt deployen?')) {
+                        await deployWorkflow(result.workflowId);
+                    }
+                } else {
+                    throw new Error(result.error || 'Save failed');
+                }
+            } catch (error) {
+                debugLog(`❌ Workflow save error: ${error.message}`);
+                showToast('Fehler beim Speichern des Workflows', 'error');
+            }
+        }
+        
+        async function deployWorkflow(workflowId) {
+            debugLog('🚀 Deploying workflow...');
+            showToast('Workflow wird deployed...', 'info');
+            
+            try {
+                const result = await vpaiSDK.deployWorkflow(workflowId);
+                
+                if (result.success) {
+                    const { deployment } = result;
+                    
+                    debugLog(`✅ Workflow deployed: ${deployment.endpoint}`);
+                    
+                    const deployInfo = `
+                        🚀 Deployment erfolgreich!\n
+                        • Status: ${deployment.status}
+                        • Endpoint: ${deployment.endpoint}
+                        • Telefonnummern: ${deployment.phoneNumbers.join(', ')}
+                        • Region: ${deployment.regions.join(', ')}
+                        
+                        Ihr Workflow ist jetzt live!
+                    `;
+                    
+                    showToast('Workflow erfolgreich deployed!', 'success');
+                    alert(deployInfo);
+                } else {
+                    throw new Error(result.error || 'Deployment failed');
+                }
+            } catch (error) {
+                debugLog(`❌ Deployment error: ${error.message}`);
+                showToast('Fehler beim Deployment', 'error');
+            }
+        }
+        
+        // Node Configuration System
+        let currentNodeConfig = null;
+        
+        function configureNode(nodeId) {
+            const node = workflowNodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            currentNodeConfig = node;
+            debugLog(`⚙️ Configuring node: ${node.name}`);
+            
+            document.getElementById('nodeConfigTitle').textContent = `Configure ${node.type} Node`;
+            document.getElementById('nodeConfigContent').innerHTML = getNodeConfigHTML(node);
+            document.getElementById('nodeConfigModal').style.display = 'block';
+        }
+        
+        function getNodeConfigHTML(node) {
+            const configs = {
+                start: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeFirstMessage">Erste Nachricht</label>
+                        <textarea id="nodeFirstMessage" class="form-textarea" rows="3" placeholder="Willkommen! Wie kann ich Ihnen helfen?">${node.firstMessage || ''}</textarea>
+                        <div class="form-help">Die erste Nachricht beim Gesprächsstart</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeVoice">Stimme</label>
+                        <select id="nodeVoice" class="form-select">
+                            <option value="alloy" ${node.voice === 'alloy' ? 'selected' : ''}>Alloy (Neutral)</option>
+                            <option value="nova" ${node.voice === 'nova' ? 'selected' : ''}>Nova (Weiblich)</option>
+                            <option value="echo" ${node.voice === 'echo' ? 'selected' : ''}>Echo (Männlich)</option>
+                        </select>
+                    </div>
+                `,
+                
+                message: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeMessage">Nachricht *</label>
+                        <textarea id="nodeMessage" class="form-textarea" rows="4" placeholder="Ihre Nachricht hier..." required>${node.message || ''}</textarea>
+                        <div class="form-help">Die Nachricht, die der Assistent sprechen soll</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeWaitForInput">Auf Eingabe warten</label>
+                        <select id="nodeWaitForInput" class="form-select">
+                            <option value="true" ${node.waitForInput ? 'selected' : ''}>Ja - Warten auf Antwort</option>
+                            <option value="false" ${!node.waitForInput ? 'selected' : ''}>Nein - Direkt fortfahren</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeVariableExtraction">Variable extrahieren</label>
+                        <input type="text" id="nodeVariableExtraction" class="form-input" placeholder="variableName" value="${node.extractVariable || ''}">
+                        <div class="form-help">Name der Variable, die aus der Antwort extrahiert werden soll</div>
+                    </div>
+                `,
+                
+                condition: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeConditionType">Bedingungstyp</label>
+                        <select id="nodeConditionType" class="form-select" onchange="updateConditionConfig()">
+                            <option value="ai" ${node.conditionType === 'ai' ? 'selected' : ''}>KI-basierte Bedingung</option>
+                            <option value="logic" ${node.conditionType === 'logic' ? 'selected' : ''}>Logische Bedingung</option>
+                            <option value="keyword" ${node.conditionType === 'keyword' ? 'selected' : ''}>Schlüsselwort-Erkennung</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeCondition">Bedingung *</label>
+                        <textarea id="nodeCondition" class="form-textarea" rows="3" placeholder="Beschreiben Sie die Bedingung..." required>${node.condition || ''}</textarea>
+                        <div class="form-help">Die Bedingung, die erfüllt sein muss</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeElseMessage">Alternative Nachricht</label>
+                        <textarea id="nodeElseMessage" class="form-textarea" rows="2" placeholder="Was passiert, wenn die Bedingung nicht erfüllt ist...">${node.elseMessage || ''}</textarea>
+                    </div>
+                `,
+                
+                api: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeApiUrl">API URL *</label>
+                        <input type="url" id="nodeApiUrl" class="form-input" placeholder="https://api.beispiel.de/endpoint" value="${node.apiUrl || ''}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeApiMethod">HTTP Methode</label>
+                        <select id="nodeApiMethod" class="form-select">
+                            <option value="GET" ${node.method === 'GET' ? 'selected' : ''}>GET</option>
+                            <option value="POST" ${node.method === 'POST' ? 'selected' : ''}>POST</option>
+                            <option value="PUT" ${node.method === 'PUT' ? 'selected' : ''}>PUT</option>
+                            <option value="DELETE" ${node.method === 'DELETE' ? 'selected' : ''}>DELETE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeApiHeaders">Headers (JSON)</label>
+                        <textarea id="nodeApiHeaders" class="form-textarea" rows="3" placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'>${node.headers || ''}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeApiBody">Request Body (JSON)</label>
+                        <textarea id="nodeApiBody" class="form-textarea" rows="4" placeholder='{"data": "{{extractedVariable}}"}'>${node.body || ''}</textarea>
+                        <div class="form-help">Verwenden Sie {{variableName}} für dynamische Werte</div>
+                    </div>
+                `,
+                
+                transfer: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeTransferNumber">Zielnummer *</label>
+                        <input type="tel" id="nodeTransferNumber" class="form-input" placeholder="+49 30 12345678" value="${node.transferNumber || ''}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeTransferMessage">Ankündigung</label>
+                        <textarea id="nodeTransferMessage" class="form-textarea" rows="2" placeholder="Ich verbinde Sie mit einem Mitarbeiter...">${node.transferMessage || ''}</textarea>
+                        <div class="form-help">Nachricht vor der Weiterleitung</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeTransferType">Weiterleitungstyp</label>
+                        <select id="nodeTransferType" class="form-select">
+                            <option value="warm" ${node.transferType === 'warm' ? 'selected' : ''}>Warm Transfer (mit Ankündigung)</option>
+                            <option value="cold" ${node.transferType === 'cold' ? 'selected' : ''}>Cold Transfer (direkt)</option>
+                        </select>
+                    </div>
+                `,
+                
+                end: `
+                    <div class="form-group">
+                        <label class="form-label" for="nodeEndMessage">Abschlussnachricht</label>
+                        <textarea id="nodeEndMessage" class="form-textarea" rows="3" placeholder="Vielen Dank für Ihren Anruf. Auf Wiederhören!">${node.endMessage || ''}</textarea>
+                        <div class="form-help">Die letzte Nachricht vor Gesprächsende</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nodeEndAction">Nach-Aktion</label>
+                        <select id="nodeEndAction" class="form-select">
+                            <option value="hangup" ${node.endAction === 'hangup' ? 'selected' : ''}>Auflegen</option>
+                            <option value="summary" ${node.endAction === 'summary' ? 'selected' : ''}>Zusammenfassung erstellen</option>
+                            <option value="email" ${node.endAction === 'email' ? 'selected' : ''}>E-Mail senden</option>
+                        </select>
+                    </div>
+                `
+            };
+            
+            return configs[node.type] || '<p>Konfiguration für diesen Node-Typ nicht verfügbar.</p>';
+        }
+        
+        function closeNodeConfigModal() {
+            document.getElementById('nodeConfigModal').style.display = 'none';
+            currentNodeConfig = null;
+        }
+        
+        function saveNodeConfiguration() {
+            if (!currentNodeConfig) return;
+            
+            const nodeType = currentNodeConfig.type;
+            const updates = {};
+            
+            // Extract values based on node type
+            switch (nodeType) {
+                case 'start':
+                    updates.firstMessage = document.getElementById('nodeFirstMessage').value;
+                    updates.voice = document.getElementById('nodeVoice').value;
+                    break;
+                case 'message':
+                    updates.message = document.getElementById('nodeMessage').value;
+                    updates.waitForInput = document.getElementById('nodeWaitForInput').value === 'true';
+                    updates.extractVariable = document.getElementById('nodeVariableExtraction').value;
+                    break;
+                case 'condition':
+                    updates.conditionType = document.getElementById('nodeConditionType').value;
+                    updates.condition = document.getElementById('nodeCondition').value;
+                    updates.elseMessage = document.getElementById('nodeElseMessage').value;
+                    break;
+                case 'api':
+                    updates.apiUrl = document.getElementById('nodeApiUrl').value;
+                    updates.method = document.getElementById('nodeApiMethod').value;
+                    updates.headers = document.getElementById('nodeApiHeaders').value;
+                    updates.body = document.getElementById('nodeApiBody').value;
+                    break;
+                case 'transfer':
+                    updates.transferNumber = document.getElementById('nodeTransferNumber').value;
+                    updates.transferMessage = document.getElementById('nodeTransferMessage').value;
+                    updates.transferType = document.getElementById('nodeTransferType').value;
+                    break;
+                case 'end':
+                    updates.endMessage = document.getElementById('nodeEndMessage').value;
+                    updates.endAction = document.getElementById('nodeEndAction').value;
+                    break;
+            }
+            
+            // Update the node
+            Object.assign(currentNodeConfig, updates);
+            
+            // Re-render nodes
+            renderWorkflowNodes();
+            closeNodeConfigModal();
+            
+            debugLog(`✅ Node configuration saved: ${currentNodeConfig.name}`);
+            showToast('Node-Konfiguration gespeichert!', 'success');
+        }
+        
+        function updateVoiceOptions() {
+            const provider = document.getElementById('voiceProvider').value;
+            const voiceSelect = document.getElementById('voiceId');
+            
+            const voices = {
+                openai: [
+                    {value: 'alloy', text: 'Alloy (Neutral)'},
+                    {value: 'echo', text: 'Echo (Männlich)'},
+                    {value: 'fable', text: 'Fable (Britisch)'},
+                    {value: 'onyx', text: 'Onyx (Tief)'},
+                    {value: 'nova', text: 'Nova (Weiblich)'},
+                    {value: 'shimmer', text: 'Shimmer (Freundlich)'}
+                ],
+                elevenlabs: [
+                    {value: 'adam', text: 'Adam (Männlich, Amerikanisch)'},
+                    {value: 'bella', text: 'Bella (Weiblich, Amerikanisch)'},
+                    {value: 'charlie', text: 'Charlie (Männlich, Australisch)'},
+                    {value: 'domi', text: 'Domi (Weiblich, Amerikanisch)'},
+                    {value: 'elli', text: 'Elli (Weiblich, Amerikanisch)'},
+                    {value: 'freya', text: 'Freya (Weiblich, Amerikanisch)'}
+                ],
+                playht: [
+                    {value: 'de-DE-1', text: 'Deutsche Stimme 1 (Weiblich)'},
+                    {value: 'de-DE-2', text: 'Deutsche Stimme 2 (Männlich)'},
+                    {value: 'en-US-1', text: 'Amerikanische Stimme 1 (Weiblich)'},
+                    {value: 'en-US-2', text: 'Amerikanische Stimme 2 (Männlich)'}
+                ],
+                azure: [
+                    {value: 'de-DE-KatjaNeural', text: 'Katja (Weiblich, Deutsch)'},
+                    {value: 'de-DE-ConradNeural', text: 'Conrad (Männlich, Deutsch)'},
+                    {value: 'en-US-JennyNeural', text: 'Jenny (Weiblich, Amerikanisch)'},
+                    {value: 'en-US-GuyNeural', text: 'Guy (Männlich, Amerikanisch)'}
+                ]
+            };
+            
+            voiceSelect.innerHTML = voices[provider].map(voice => 
+                `<option value="${voice.value}">${voice.text}</option>`
+            ).join('');
+        }
+        
+        function deleteNode(nodeId) {
+            workflowNodes = workflowNodes.filter(n => n.id !== nodeId);
+            renderWorkflowNodes();
+            if (workflowNodes.length === 0) {
+                document.getElementById('workflow-empty').style.display = 'block';
+            }
+            debugLog('🗑️ Deleted workflow node');
+            showToast('Node deleted', 'success');
+        }
+        
+        // Simple drag functionality
+        let draggedNode = null;
+        let dragOffset = { x: 0, y: 0 };
+        
+        function startDrag(nodeId, event) {
+            draggedNode = nodeId;
+            const nodeElement = event.target.closest('.workflow-node');
+            const rect = nodeElement.getBoundingClientRect();
+            const canvasRect = document.getElementById('workflow-canvas').getBoundingClientRect();
+            dragOffset.x = event.clientX - rect.left;
+            dragOffset.y = event.clientY - rect.top;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            event.preventDefault();
+        }
+        
+        function drag(event) {
+            if (!draggedNode) return;
+            
+            const canvasRect = document.getElementById('workflow-canvas').getBoundingClientRect();
+            const x = event.clientX - canvasRect.left - dragOffset.x;
+            const y = event.clientY - canvasRect.top - dragOffset.y;
+            
+            const node = workflowNodes.find(n => n.id === draggedNode);
+            if (node) {
+                node.x = Math.max(0, x);
+                node.y = Math.max(0, y);
+                renderWorkflowNodes();
+            }
+        }
+        
+        function stopDrag() {
+            draggedNode = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            renderWorkflowNodes(); // Re-render to update connections
+        }
+        
+        // Advanced Connection System
+        function startConnection(nodeId, type, event) {
+            event.stopPropagation();
+            
+            if (!isConnecting) {
+                // Start new connection
+                isConnecting = true;
+                connectionStart = { nodeId, type };
+                debugLog(`🔗 Starting connection from ${nodeId} (${type})`);
+                
+                // Add temporary connection line
+                document.addEventListener('mousemove', updateTempConnection);
+                document.addEventListener('click', cancelConnection);
+            } else {
+                // Complete connection
+                if (connectionStart.nodeId !== nodeId && canConnect(connectionStart, { nodeId, type })) {
+                    createConnection(connectionStart, { nodeId, type });
+                    debugLog(`✅ Connected ${connectionStart.nodeId} → ${nodeId}`);
+                    showToast('Nodes connected successfully!', 'success');
+                } else {
+                    debugLog(`❌ Cannot connect ${connectionStart.nodeId} to ${nodeId}`);
+                    showToast('Invalid connection', 'error');
+                }
+                
+                cancelConnection();
+            }
+        }
+        
+        function canConnect(from, to) {
+            // Logic validation
+            if (from.nodeId === to.nodeId) return false;
+            if (from.type === 'input' && to.type === 'input') return false;
+            if (from.type === 'output' && to.type === 'output') return false;
+            
+            // Check if connection already exists
+            const existingConnection = workflowConnections.find(conn => 
+                (conn.from === from.nodeId && conn.to === to.nodeId) ||
+                (conn.from === to.nodeId && conn.to === from.nodeId)
+            );
+            
+            return !existingConnection;
+        }
+        
+        function createConnection(from, to) {
+            const connection = {
+                id: `conn-${Date.now()}`,
+                from: from.type === 'output' ? from.nodeId : to.nodeId,
+                to: from.type === 'output' ? to.nodeId : from.nodeId,
+                condition: 'default'
+            };
+            
+            workflowConnections.push(connection);
+            renderWorkflowNodes();
+        }
+        
+        function updateTempConnection(event) {
+            const canvas = document.getElementById('workflow-canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Update temporary connection line (implementation would go here)
+        }
+        
+        function cancelConnection() {
+            isConnecting = false;
+            connectionStart = null;
+            document.removeEventListener('mousemove', updateTempConnection);
+            document.removeEventListener('click', cancelConnection);
+        }
+        
+        function renderConnections() {
+            return workflowConnections.map(conn => {
+                const fromNode = workflowNodes.find(n => n.id === conn.from);
+                const toNode = workflowNodes.find(n => n.id === conn.to);
+                
+                if (!fromNode || !toNode) return '';
+                
+                const fromX = fromNode.x + 150; // node width
+                const fromY = fromNode.y + 50;  // node height / 2
+                const toX = toNode.x;
+                const toY = toNode.y + 50;
+                
+                // Create curved path
+                const midX = (fromX + toX) / 2;
+                const path = `M ${fromX} ${fromY} Q ${midX + 50} ${fromY} ${midX} ${(fromY + toY) / 2} Q ${midX - 50} ${toY} ${toX} ${toY}`;
+                
+                return `
+                    <path d="${path}" class="connection-line" onclick="selectConnection('${conn.id}')" style="cursor: pointer;" />
+                    <text x="${midX}" y="${(fromY + toY) / 2 - 10}" fill="#64748b" font-size="12" text-anchor="middle">
+                        ${conn.condition}
+                    </text>
+                `;
+            }).join('');
+        }
+        
+        function selectConnection(connectionId) {
+            debugLog(`🔗 Selected connection: ${connectionId}`);
+            const connection = workflowConnections.find(c => c.id === connectionId);
+            if (connection && confirm('Delete this connection?')) {
+                workflowConnections = workflowConnections.filter(c => c.id !== connectionId);
+                renderWorkflowNodes();
+                showToast('Connection deleted', 'success');
+            }
+        }
+        
+        async function buyPhoneNumber() {
+            const country = prompt('Land auswählen (DE, US, UK):', 'DE');
+            if (!country) return;
+            
+            debugLog(`📞 Buying ${country} phone number...`);
+            showToast(`Telefonnummer wird gekauft (${country})...`, 'info');
+            
+            try {
+                const result = await vpaiSDK.buyPhoneNumber(country.toUpperCase());
+                
+                if (result.success) {
+                    const { phoneNumber } = result;
+                    
+                    // Add to local data
+                    phoneNumbers.push({
+                        id: phoneNumber.id,
+                        number: phoneNumber.number,
+                        country: phoneNumber.country,
+                        status: phoneNumber.status,
+                        assistant: null,
+                        cost: phoneNumber.monthlyFee,
+                        currency: phoneNumber.currency
+                    });
+                    
+                    saveToStorage(STORAGE_KEYS.phoneNumbers, phoneNumbers);
+                    renderPhoneNumbers();
+                    
+                    debugLog(`✅ Phone number purchased: ${phoneNumber.number}`);
+                    showToast(`Nummer erfolgreich gekauft: ${phoneNumber.number}`, 'success');
+                    
+                    const purchaseInfo = `
+                        📞 Neue Telefonnummer:\n
+                        • Nummer: ${phoneNumber.number}
+                        • Land: ${phoneNumber.country}
+                        • Typ: ${phoneNumber.type}
+                        • Monatliche Kosten: ${phoneNumber.monthlyFee} ${phoneNumber.currency}
+                        
+                        Die Nummer ist sofort einsatzbereit!
+                    `;
+                    
+                    alert(purchaseInfo);
+                } else {
+                    throw new Error(result.error || 'Purchase failed');
+                }
+            } catch (error) {
+                debugLog(`❌ Phone number purchase error: ${error.message}`);
+                showToast('Fehler beim Kauf der Telefonnummer', 'error');
+            }
+        }
+        
+        function renderPhoneNumbers() {
+            // Add cost data
+            phoneNumbers = phoneNumbers.map(phone => ({
+                ...phone,
+                cost: phone.country === 'US' ? '$2.99' : phone.country === 'DE' ? '€3.49' : '$2.99'
+            }));
+            
+            const tbody = document.getElementById('phone-numbers-tbody');
+            
+            tbody.innerHTML = phoneNumbers.map(phone => `
+                <tr>
+                    <td>
+                        <div class="table-name">${phone.number}</div>
+                        <div class="table-meta">Local number</div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <img src="https://flagcdn.com/w20/${phone.country.toLowerCase()}.png" alt="${phone.country}" style="width: 16px; height: 12px; border-radius: 2px;">
+                            <span class="table-meta">${phone.country}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="table-meta">${phone.assistant || 'Not assigned'}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${phone.status}">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                            ${phone.status}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="table-meta">${phone.cost}/month</span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn primary" onclick="testNumber('${phone.id}')" title="Test Call">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="action-btn" onclick="configureNumber('${phone.id}')" title="Configure">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button class="action-btn" onclick="assignAssistant('${phone.id}')" title="Assign Assistant">
+                                <i class="fas fa-user-plus"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderCalls() {
+            const tbody = document.getElementById('calls-tbody');
+            
+            tbody.innerHTML = calls.map(call => {
+                const statusConfig = {
+                    completed: { class: 'active', icon: 'check-circle' },
+                    active: { class: 'active', icon: 'pulse' },
+                    failed: { class: 'inactive', icon: 'times-circle' }
+                };
+                
+                const config = statusConfig[call.status] || statusConfig.completed;
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="table-name">${call.from}</div>
+                            <div class="table-meta">Inbound call</div>
+                        </td>
+                        <td>
+                            <div class="table-name">${call.to}</div>
+                            <div class="table-meta">VoicePartnerAI</div>
+                        </td>
+                        <td>
+                            <span class="table-meta">${call.assistant}</span>
+                        </td>
+                        <td>
+                            <span class="table-meta">${call.duration}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge ${config.class}" style="${call.status === 'active' ? 'animation: pulse 2s infinite;' : ''}">
+                                <i class="fas fa-${config.icon}" style="font-size: 0.5rem;"></i>
+                                ${call.status}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="table-meta">${call.time}</span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                ${call.status === 'active' ? `
+                                    <button class="action-btn primary" onclick="joinCall('${call.id}')" title="Join Call">
+                                        <i class="fas fa-headphones"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="action-btn" onclick="viewCallDetails('${call.id}')" title="View Details">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="action-btn" onclick="downloadRecording('${call.id}')" title="Download">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function configureNumber(id) {
+            const number = phoneNumbers.find(n => n.id === id);
+            debugLog(`⚙️ Configuring number: ${number.number}`);
+            showToast('Number configuration opening...', 'info');
+        }
+        
+        function assignAssistant(id) {
+            const number = phoneNumbers.find(n => n.id === id);
+            debugLog(`🤖 Assigning assistant to: ${number.number}`);
+            showToast('Assistant assignment opening...', 'info');
+        }
+        
+        function testNumber(id) {
+            const number = phoneNumbers.find(n => n.id === id);
+            debugLog(`📞 Testing number: ${number.number}`);
+            showToast(`Test call initiated to ${number.number}`, 'info');
+        }
+        
+        function joinCall(id) {
+            const call = calls.find(c => c.id === id);
+            debugLog(`🎧 Joining call: ${call.from} → ${call.to}`);
+            showToast('Joining live call...', 'success');
+        }
+        
+        function viewCallDetails(id) {
+            const call = calls.find(c => c.id === id);
+            debugLog(`📄 Viewing call details: ${call.id}`);
+            showToast('Call details opening...', 'info');
+        }
+        
+        function downloadRecording(id) {
+            const call = calls.find(c => c.id === id);
+            debugLog(`💾 Downloading recording: ${call.id}`);
+            showToast('Recording download started...', 'success');
+        }
+        
+        function refreshCalls() {
+            debugLog('🔄 Refreshing calls...');
+            renderCalls();
+            showToast('Calls refreshed', 'success');
+        }
+        
+        function exportCalls() {
+            debugLog('📊 Exporting call data...');
+            showToast('Call data exported to CSV', 'success');
+        }
+        
+        function showToast(message, type = 'info') {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--danger-color)' : 'var(--primary-color)'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: var(--shadow-md);
+                z-index: 1001;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const assistantModal = document.getElementById('assistantModal');
+            const nodeModal = document.getElementById('nodeConfigModal');
+            
+            if (event.target === assistantModal) {
+                closeAssistantModal();
+            }
+            
+            if (event.target === nodeModal) {
+                closeNodeConfigModal();
+            }
+        }
+        
+        // Initialize content when sections are shown
+        const originalNavigateToSection = navigateToSection;
+        navigateToSection = function(sectionName) {
+            originalNavigateToSection(sectionName);
+            setTimeout(() => {
+                if (sectionName === 'assistants') {
+                    renderAssistants();
+                } else if (sectionName === 'phone-numbers') {
+                    renderPhoneNumbers();
+                } else if (sectionName === 'calls') {
+                    renderCalls();
+                }
+            }, 100);
+        }
+        
+        // Local Storage Persistierung System
+        const STORAGE_KEYS = {
+            assistants: 'voicepartnerai_assistants',
+            workflows: 'voicepartnerai_workflows',
+            phoneNumbers: 'voicepartnerai_phone_numbers',
+            calls: 'voicepartnerai_calls'
+        };
+        
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                debugLog(`💾 Saved ${key} to local storage`);
+                return true;
+            } catch (error) {
+                debugLog(`❌ Failed to save ${key}: ${error.message}`);
+                return false;
+            }
+        }
+        
+        function loadFromStorage(key, defaultValue = []) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (error) {
+                debugLog(`❌ Failed to load ${key}: ${error.message}`);
+                return defaultValue;
+            }
+        }
+        
+        // Mock Vapi SDK for German Market
+        class VoicePartnerAI_SDK {
+            constructor() {
+                this.apiKey = 'vpai_demo_key_germany';
+                this.baseUrl = 'https://api.voicepartnerai.de/v1';
+                this.isDemo = true;
+            }
+            
+            async createAssistant(config) {
+                debugLog('🤖 VoicePartnerAI SDK: Creating assistant...');
+                
+                // Simulate API call delay
+                await this.delay(1500);
+                
+                const assistant = {
+                    ...config,
+                    id: `vpai_${Date.now()}`,
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    apiEndpoint: `${this.baseUrl}/assistants/${config.id}`,
+                    webhookUrl: `${this.baseUrl}/webhooks/${config.id}`
+                };
+                
+                return {
+                    success: true,
+                    assistant: assistant,
+                    message: 'Assistant erfolgreich erstellt'
+                };
+            }
+            
+            async testAssistant(assistantId) {
+                debugLog(`🧪 VoicePartnerAI SDK: Testing assistant ${assistantId}...`);
+                
+                await this.delay(2000);
+                
+                const testResults = {
+                    success: true,
+                    testCall: {
+                        id: `test_${Date.now()}`,
+                        duration: '45s',
+                        status: 'completed',
+                        transcript: 'Hallo! Wie kann ich Ihnen heute helfen?',
+                        latency: '420ms',
+                        accuracy: '98.5%'
+                    },
+                    metrics: {
+                        responseTime: 420,
+                        speechQuality: 'excellent',
+                        languageDetection: 'german',
+                        sentiment: 'friendly'
+                    }
+                };
+                
+                return testResults;
+            }
+            
+            async saveWorkflow(workflow) {
+                debugLog('🔄 VoicePartnerAI SDK: Saving workflow...');
+                
+                await this.delay(1000);
+                
+                return {
+                    success: true,
+                    workflowId: `wf_${Date.now()}`,
+                    message: 'Workflow erfolgreich gespeichert',
+                    deployUrl: `${this.baseUrl}/workflows/${workflow.id}/deploy`
+                };
+            }
+            
+            async deployWorkflow(workflowId) {
+                debugLog(`🚀 VoicePartnerAI SDK: Deploying workflow ${workflowId}...`);
+                
+                await this.delay(2500);
+                
+                return {
+                    success: true,
+                    deployment: {
+                        id: `deploy_${Date.now()}`,
+                        status: 'live',
+                        endpoint: `${this.baseUrl}/workflows/${workflowId}/call`,
+                        phoneNumbers: ['+49 30 12345678'],
+                        regions: ['eu-central-1']
+                    },
+                    message: 'Workflow erfolgreich deployed'
+                };
+            }
+            
+            async buyPhoneNumber(country, type = 'local') {
+                debugLog(`📞 VoicePartnerAI SDK: Buying ${country} phone number...`);
+                
+                await this.delay(3000);
+                
+                const numbers = {
+                    'DE': '+49 30 ' + Math.floor(Math.random() * 10000000),
+                    'US': '+1 555 ' + Math.floor(Math.random() * 1000000),
+                    'UK': '+44 20 ' + Math.floor(Math.random() * 10000000)
+                };
+                
+                return {
+                    success: true,
+                    phoneNumber: {
+                        id: `pn_${Date.now()}`,
+                        number: numbers[country] || numbers['DE'],
+                        country: country,
+                        type: type,
+                        status: 'active',
+                        monthlyFee: country === 'DE' ? 3.49 : 2.99,
+                        currency: country === 'DE' ? 'EUR' : 'USD'
+                    },
+                    message: 'Telefonnummer erfolgreich gekauft'
+                };
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Initialize SDK
+        const vpaiSDK = new VoicePartnerAI_SDK();
+        
+        // Load data from storage on initialization
+        function initializeData() {
+            assistants = loadFromStorage(STORAGE_KEYS.assistants, [
+                {
+                    id: '1',
+                    name: 'Customer Support DE',
+                    systemPrompt: 'Sie sind ein freundlicher Kundensupport-Assistent für deutsche Kunden.',
+                    status: 'active',
+                    voice: 'alloy',
+                    model: 'gpt-3.5-turbo',
+                    createdAt: new Date().toLocaleDateString()
+                },
+                {
+                    id: '2', 
+                    name: 'Sales Assistant DE',
+                    systemPrompt: 'Sie sind ein hilfsreicher Vertriebsassistent für den deutschen Markt.',
+                    status: 'inactive',
+                    voice: 'nova',
+                    model: 'gpt-4',
+                    createdAt: new Date().toLocaleDateString()
+                }
+            ]);
+            
+            phoneNumbers = loadFromStorage(STORAGE_KEYS.phoneNumbers, [
+                { id: '1', number: '+49 30 12345678', country: 'DE', status: 'active', assistant: 'Customer Support DE' },
+                { id: '2', number: '+1 (555) 987-6543', country: 'US', status: 'active', assistant: 'Sales Assistant DE' },
+                { id: '3', number: '+44 20 87654321', country: 'UK', status: 'inactive', assistant: null }
+            ]);
+            
+            calls = loadFromStorage(STORAGE_KEYS.calls, [
+                { id: '1', from: '+49 30 11111111', to: '+49 30 12345678', assistant: 'Customer Support DE', status: 'completed', duration: '3:45', time: '2 mins ago' },
+                { id: '2', from: '+49 30 22222222', to: '+1 (555) 987-6543', assistant: 'Sales Assistant DE', status: 'active', duration: '1:23', time: 'Now' },
+                { id: '3', from: '+49 30 33333333', to: '+49 30 12345678', assistant: 'Customer Support DE', status: 'failed', duration: '0:15', time: '5 mins ago' }
+            ]);
+        }
+        
+        // Initial log
+        debugLog('🚀 VoicePartnerAI - Next German Unicorn Platform initialized');
+        debugLog('🇩🇪 Optimized for German market with DSGVO compliance');
+        initializeData();
+    </script>
+</body>
+</html>

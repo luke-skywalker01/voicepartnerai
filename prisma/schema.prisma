@@ -1,0 +1,380 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  assistants    VoiceAssistant[]
+  workflows     Workflow[]
+  squads        Squad[]
+  phoneNumbers  PhoneNumber[]
+  callSessions  CallSession[]
+  testSuites    VoiceTestSuite[]
+  integrations  Integration[]
+  
+  // Organization
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  
+  @@map("users")
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  domain      String?  @unique
+  settings    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  
+  @@map("organizations")
+}
+
+model VoiceAssistant {
+  id                    String    @id @default(cuid())
+  name                  String
+  description           String?
+  systemPrompt          String
+  firstMessage          String?
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Configuration
+  voiceConfig           Json
+  modelConfig           Json
+  transcriptionConfig   Json
+  analyticsConfig       Json
+  complianceSettings    Json
+  
+  // Relations
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  tools                 AssistantTool[]
+  workflows             WorkflowReference[]
+  callSessions          CallSession[]
+  squadMembers          SquadAssistant[]
+  
+  @@map("voice_assistants")
+}
+
+model AssistantTool {
+  id            String    @id @default(cuid())
+  name          String
+  description   String
+  type          ToolType
+  configuration Json
+  isAsync       Boolean   @default(false)
+  timeout       Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  assistantId   String
+  assistant     VoiceAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  
+  @@map("assistant_tools")
+}
+
+model Workflow {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  version       String    @default("1.0.0")
+  isPublished   Boolean   @default(false)
+  nodes         Json
+  edges         Json
+  variables     Json
+  settings      Json
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  references    WorkflowReference[]
+  callSessions  CallSession[]
+  
+  @@map("workflows")
+}
+
+model WorkflowReference {
+  id            String    @id @default(cuid())
+  name          String
+  version       String
+  isDefault     Boolean   @default(false)
+  
+  assistantId   String
+  assistant     VoiceAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  workflowId    String
+  workflow      Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  @@unique([assistantId, workflowId])
+  @@map("workflow_references")
+}
+
+model Squad {
+  id                String    @id @default(cuid())
+  name              String
+  description       String?
+  transferSettings  Json
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  assistants        SquadAssistant[]
+  routingRules      RoutingRule[]
+  callSessions      CallSession[]
+  
+  @@map("squads")
+}
+
+model SquadAssistant {
+  id            String    @id @default(cuid())
+  role          String
+  priority      Int
+  conditions    Json?
+  
+  squadId       String
+  squad         Squad     @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  assistantId   String
+  assistant     VoiceAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  
+  @@unique([squadId, assistantId])
+  @@map("squad_assistants")
+}
+
+model RoutingRule {
+  id                  String    @id @default(cuid())
+  condition           Json
+  preserveContext     Boolean   @default(true)
+  targetAssistantId   String
+  
+  squadId             String
+  squad               Squad     @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  
+  @@map("routing_rules")
+}
+
+model PhoneNumber {
+  id            String    @id @default(cuid())
+  number        String    @unique
+  country       String
+  type          PhoneNumberType
+  provider      PhoneProvider
+  assignedTo    String?
+  status        PhoneStatus @default(ACTIVE)
+  capabilities  Json
+  createdAt     DateTime  @default(now())
+  
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  callSessions  CallSession[]
+  
+  @@map("phone_numbers")
+}
+
+model CallSession {
+  id            String        @id @default(cuid())
+  phoneNumber   String
+  direction     CallDirection
+  status        CallStatus
+  startTime     DateTime      @default(now())
+  endTime       DateTime?
+  duration      Int?
+  metadata      Json          @default("{}")
+  analytics     Json          @default("{}")
+  
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  assistantId   String?
+  assistant     VoiceAssistant? @relation(fields: [assistantId], references: [id])
+  workflowId    String?
+  workflow      Workflow?     @relation(fields: [workflowId], references: [id])
+  squadId       String?
+  squad         Squad?        @relation(fields: [squadId], references: [id])
+  phoneNumberId String?
+  phoneNumberRef PhoneNumber? @relation(fields: [phoneNumberId], references: [id])
+  
+  transcript    TranscriptEntry[]
+  
+  @@map("call_sessions")
+}
+
+model TranscriptEntry {
+  id            String    @id @default(cuid())
+  timestamp     DateTime  @default(now())
+  speaker       Speaker
+  text          String
+  confidence    Float
+  sentiment     Sentiment?
+  
+  sessionId     String
+  session       CallSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("transcript_entries")
+}
+
+model Integration {
+  id            String           @id @default(cuid())
+  name          String
+  type          IntegrationType
+  configuration Json
+  isActive      Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  
+  @@map("integrations")
+}
+
+model VoiceTestSuite {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  tests         Json
+  schedule      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  results       TestResult[]
+  
+  @@map("voice_test_suites")
+}
+
+model TestResult {
+  id              String        @id @default(cuid())
+  testId          String
+  status          TestStatus
+  score           Float
+  details         Json
+  executionTime   Int
+  timestamp       DateTime      @default(now())
+  
+  testSuiteId     String
+  testSuite       VoiceTestSuite @relation(fields: [testSuiteId], references: [id], onDelete: Cascade)
+  
+  @@map("test_results")
+}
+
+// Analytics and Monitoring
+model CallAnalytics {
+  id                String    @id @default(cuid())
+  sessionId         String    @unique
+  totalDuration     Int
+  talkTime          Int
+  silenceTime       Int
+  interruptionCount Int
+  sentimentScore    Float
+  keywordsDetected  String[]
+  successMetrics    Json
+  createdAt         DateTime  @default(now())
+  
+  @@map("call_analytics")
+}
+
+model SystemMetrics {
+  id            String    @id @default(cuid())
+  timestamp     DateTime  @default(now())
+  averageLatency Float
+  totalCalls    Int
+  activeCalls   Int
+  errorRate     Float
+  systemLoad    Json
+  
+  @@map("system_metrics")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  USER
+  DEVELOPER
+  VIEWER
+}
+
+enum ToolType {
+  FUNCTION
+  WEBHOOK
+  INTEGRATION
+}
+
+enum PhoneNumberType {
+  LOCAL
+  TOLL_FREE
+  MOBILE
+}
+
+enum PhoneProvider {
+  TWILIO
+  VONAGE
+  BANDWIDTH
+  CUSTOM
+}
+
+enum PhoneStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum CallStatus {
+  RINGING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum Speaker {
+  ASSISTANT
+  USER
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum IntegrationType {
+  WEBHOOK
+  ZAPIER
+  MAKE
+  N8N
+  CUSTOM
+}
+
+enum TestStatus {
+  PASSED
+  FAILED
+  RUNNING
+  CANCELLED
+}

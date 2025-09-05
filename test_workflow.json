@@ -1,0 +1,22 @@
+{
+  "name": "Vapi Test Workflow",
+  "description": "Test der neuen Vapi Engine",
+  "nodes": [
+    {
+      "id": "conv-1",
+      "type": "vapi",
+      "position": {"x": 100, "y": 100},
+      "data": {
+        "type": "conversation",
+        "label": "Begrüßung",
+        "config": {
+          "prompt": "Hallo! Willkommen bei unserem Vapi-Test.",
+          "extractVariables": ["customer_name"]
+        }
+      }
+    }
+  ],
+  "connections": [],
+  "settings": {},
+  "active": true
+}

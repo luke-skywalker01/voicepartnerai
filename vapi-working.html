@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vapi - Create Assistant (WORKING)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        /* Header wie bei Vapi */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Vapi Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+
+        /* Sidebar Templates */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-desc {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .template-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Vapi Template Cards */
+        .template-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .template-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .template-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .template-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .template-desc {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .template-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .template-tag {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 2rem;
+        }
+
+        .assistant-name-input {
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #111827;
+            width: 100%;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .assistant-name-input:focus {
+            outline: none;
+            border-bottom-color: #3b82f6;
+        }
+
+        .assistant-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Tabs */
+        .config-tabs {
+            display: flex;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .config-tab {
+            padding: 1rem 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .config-tab:hover {
+            color: #111827;
+            background: white;
+        }
+
+        .config-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        .config-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: white;
+        }
+
+        /* Form Elements */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Provider Cards */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .provider-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .provider-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .provider-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .provider-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #6b7280;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .provider-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Action Buttons */
+        .action-panel {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-large {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            Vapi
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link active">Assistants</a>
+            <a href="#" class="nav-link">Phone Numbers</a>
+            <a href="#" class="nav-link">Call Logs</a>
+        </nav>
+        <div class="user-menu">
+            <button class="btn btn-secondary">
+                <i class="fas fa-question-circle"></i>
+                Help
+            </button>
+            <button class="btn btn-secondary">
+                <i class="fas fa-user-circle"></i>
+                Demo User
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar - Templates -->
+        <div class="sidebar">
+            <div class="sidebar-title">Choose a template</div>
+            <div class="sidebar-desc">Start with a pre-configured assistant template</div>
+
+            <div class="template-section-title">Popular Templates</div>
+            
+            <div class="template-card selected" data-template="blank">
+                <div class="template-name">Blank Assistant</div>
+                <div class="template-desc">Start from scratch with a completely customizable assistant</div>
+                <div class="template-tags">
+                    <span class="template-tag">Custom</span>
+                </div>
+            </div>
+
+            <div class="template-card" data-template="customer-support">
+                <div class="template-name">Customer Support Agent</div>
+                <div class="template-desc">Handle customer inquiries and support requests professionally</div>
+                <div class="template-tags">
+                    <span class="template-tag">Support</span>
+                    <span class="template-tag">CRM</span>
+                </div>
+            </div>
+
+            <div class="template-card" data-template="appointment-setter">
+                <div class="template-name">Appointment Setter</div>
+                <div class="template-desc">Schedule appointments and manage calendars efficiently</div>
+                <div class="template-tags">
+                    <span class="template-tag">Scheduling</span>
+                    <span class="template-tag">Calendar</span>
+                </div>
+            </div>
+
+            <div class="template-card" data-template="sales-agent">
+                <div class="template-name">Sales Agent</div>
+                <div class="template-desc">Qualify leads and close deals with intelligent conversation</div>
+                <div class="template-tags">
+                    <span class="template-tag">Sales</span>
+                    <span class="template-tag">Lead Gen</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="content-header">
+                <input type="text" class="assistant-name-input" placeholder="Untitled Assistant" value="Customer Service Bot">
+                <div class="assistant-status">
+                    <div class="status-dot"></div>
+                    <span>Ready to configure</span>
+                </div>
+            </div>
+
+            <!-- Config Tabs -->
+            <div class="config-tabs">
+                <button class="config-tab active" data-tab="voice">
+                    <i class="fas fa-microphone"></i>
+                    Voice
+                </button>
+                <button class="config-tab" data-tab="llm">
+                    <i class="fas fa-brain"></i>
+                    LLM
+                </button>
+                <button class="config-tab" data-tab="functions">
+                    <i class="fas fa-cogs"></i>
+                    Functions
+                </button>
+                <button class="config-tab" data-tab="advanced">
+                    <i class="fas fa-sliders-h"></i>
+                    Advanced
+                </button>
+            </div>
+
+            <!-- Config Content -->
+            <div class="config-content">
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i>
+                    Assistant created successfully!
+                </div>
+
+                <!-- Voice Tab -->
+                <div class="tab-panel active" id="voice-panel">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-volume-up"></i>
+                            Text-to-Speech Provider
+                        </div>
+                        <div class="provider-grid">
+                            <div class="provider-card selected" data-provider="elevenlabs">
+                                <div class="provider-icon">🔊</div>
+                                <div class="provider-name">ElevenLabs</div>
+                                <div class="provider-desc">Premium voice quality</div>
+                            </div>
+                            <div class="provider-card" data-provider="openai">
+                                <div class="provider-icon">🎤</div>
+                                <div class="provider-name">OpenAI</div>
+                                <div class="provider-desc">Natural speech</div>
+                            </div>
+                            <div class="provider-card" data-provider="azure">
+                                <div class="provider-icon">☁️</div>
+                                <div class="provider-name">Azure</div>
+                                <div class="provider-desc">Enterprise ready</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-microphone-alt"></i>
+                            Speech-to-Text Provider
+                        </div>
+                        <div class="provider-grid">
+                            <div class="provider-card selected" data-provider="deepgram">
+                                <div class="provider-icon">🌊</div>
+                                <div class="provider-name">Deepgram</div>
+                                <div class="provider-desc">Real-time accuracy</div>
+                            </div>
+                            <div class="provider-card" data-provider="google">
+                                <div class="provider-icon">🔍</div>
+                                <div class="provider-name">Google</div>
+                                <div class="provider-desc">Multi-language support</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LLM Tab -->
+                <div class="tab-panel" id="llm-panel">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-brain"></i>
+                            Language Model
+                        </div>
+                        <div class="provider-grid">
+                            <div class="provider-card selected" data-provider="openai-gpt4">
+                                <div class="provider-icon">🧠</div>
+                                <div class="provider-name">GPT-4</div>
+                                <div class="provider-desc">Most capable model</div>
+                            </div>
+                            <div class="provider-card" data-provider="anthropic">
+                                <div class="provider-icon">🤖</div>
+                                <div class="provider-name">Claude</div>
+                                <div class="provider-desc">Safe & helpful</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">System Message</label>
+                        <textarea class="form-input form-textarea" placeholder="You are a helpful customer service assistant...">You are a professional customer service assistant. Be helpful, polite, and provide accurate information to customers.</textarea>
+                    </div>
+                </div>
+
+                <!-- Functions Tab -->
+                <div class="tab-panel" id="functions-panel">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-tools"></i>
+                            Available Functions
+                        </div>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">Add custom functions to extend your assistant's capabilities</p>
+                        
+                        <div class="form-group">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-plus"></i>
+                                Add Function
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Tab -->
+                <div class="tab-panel" id="advanced-panel">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-sliders-h"></i>
+                            Advanced Settings
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Response Temperature</label>
+                            <input type="range" class="form-input" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Max Response Length</label>
+                            <input type="number" class="form-input" value="150" placeholder="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Panel -->
+            <div class="action-panel">
+                <div>
+                    <span style="color: #6b7280; font-size: 0.875rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Changes are saved automatically
+                    </span>
+                </div>
+                <button class="btn btn-primary btn-large" onclick="createAssistant()">
+                    <i class="fas fa-plus"></i>
+                    Create Assistant
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Vapi Working Interface loaded');
+        
+        // Tab switching
+        document.querySelectorAll('.config-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active from all tabs and panels
+                document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                
+                // Add active to clicked tab
+                this.classList.add('active');
+                const targetPanel = document.getElementById(this.dataset.tab + '-panel');
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+                
+                console.log(`✅ Switched to ${this.dataset.tab} tab`);
+            });
+        });
+
+        // Template selection
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                const template = this.dataset.template;
+                console.log(`✅ Selected template: ${template}`);
+                
+                // Update assistant name based on template
+                const nameInput = document.querySelector('.assistant-name-input');
+                const templateNames = {
+                    'blank': 'Custom Assistant',
+                    'customer-support': 'Customer Service Bot',
+                    'appointment-setter': 'Appointment Scheduler',
+                    'sales-agent': 'Sales Assistant'
+                };
+                nameInput.value = templateNames[template] || 'Untitled Assistant';
+            });
+        });
+
+        // Provider selection
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const section = this.closest('.form-section');
+                section.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                console.log(`✅ Selected provider: ${this.dataset.provider}`);
+            });
+        });
+
+        // Create Assistant function
+        function createAssistant() {
+            console.log('🚀 Creating assistant...');
+            
+            const assistantName = document.querySelector('.assistant-name-input').value;
+            const selectedTemplate = document.querySelector('.template-card.selected').dataset.template;
+            
+            // Show success message
+            const successMsg = document.getElementById('successMessage');
+            successMsg.style.display = 'block';
+            successMsg.innerHTML = `<i class="fas fa-check-circle"></i> Assistant "${assistantName}" created successfully!`;
+            
+            // Update status
+            document.querySelector('.assistant-status span').textContent = 'Assistant created successfully!';
+            
+            console.log(`✅ Assistant created: ${assistantName} using ${selectedTemplate} template`);
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+
+        // Test all functionality
+        function testFunctionality() {
+            console.log('🧪 Testing all functionality...');
+            
+            // Test template selection
+            document.querySelector('[data-template="customer-support"]').click();
+            setTimeout(() => {
+                // Test tab switching
+                document.querySelector('[data-tab="llm"]').click();
+                setTimeout(() => {
+                    // Test provider selection
+                    document.querySelector('[data-provider="anthropic"]').click();
+                    setTimeout(() => {
+                        // Test create assistant
+                        createAssistant();
+                        console.log('✅ All functionality tests completed!');
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        // Auto-test after 2 seconds
+        setTimeout(testFunctionality, 2000);
+    </script>
+</body>
+</html>

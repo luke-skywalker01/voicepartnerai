@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Critical CSS - Above the fold optimizations */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  body {
+    font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Reduce layout shift */
+  img, video {
+    height: auto;
+    max-width: 100%;
+  }
+
+  /* Optimize critical rendering path */
+  .hero-section {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* Performance optimizations for animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* Vapi.ai Light Mode Colors */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 100% 67%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 45%;
+    --accent: 168 83% 78%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 100% 67%;
+    --radius: 0.5rem;
+    
+    /* Vapi specific */
+    --vapi-sidebar: 0 0% 4%;
+    --vapi-sidebar-foreground: 0 0% 95%;
+    --vapi-card: 240 3.7% 15.9%;
+    --vapi-card-foreground: 0 0% 95%;
+  }
+
+  .dark {
+    /* Vapi.ai Dark Mode (Default) */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card: 240 3.7% 15.9%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 3.7% 15.9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 240 100% 67%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 168 83% 78%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 100% 67%;
+    
+    /* Vapi specific dark */
+    --vapi-sidebar: 0 0% 4%;
+    --vapi-sidebar-foreground: 0 0% 95%;
+    --vapi-card: 240 3.7% 15.9%;
+    --vapi-card-foreground: 0 0% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+
+  /* Anthropic-style heading */
+  .anthropic-heading {
+    @apply text-5xl md:text-6xl lg:text-7xl font-normal leading-tight tracking-tight text-foreground;
+  }
+
+  /* Smooth animations */
+  .anthropic-fade {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  /* Abstract illustration styles */
+  .organic-shape {
+    @apply text-accent;
+  }
+
+  /* Additional animation delays */
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+  
+  .delay-1000 {
+    animation-delay: 1000ms;
+  }
+}
+
+@layer components {
+  /* Voice AI specific styles */
+  .voice-status-recording {
+    @apply bg-red-400 animate-pulse;
+  }
+
+  .voice-status-listening {
+    @apply bg-blue-400 animate-pulse;
+  }
+
+  .voice-status-thinking {
+    @apply bg-yellow-400 animate-pulse;
+  }
+
+  .voice-status-speaking {
+    @apply bg-green-400 animate-pulse;
+  }
+
+  /* Bot card styles */
+  .bot-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  .bot-card:hover {
+    @apply transform -translate-y-1;
+  }
+
+  /* Dashboard grid */
+  .dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  /* Metric cards */
+  .metric-card {
+    @apply bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-4;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-md transition-colors;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 px-4 py-2 rounded-md transition-colors;
+  }
+
+  /* Status badges */
+  .status-active {
+    @apply bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800;
+  }
+
+  .status-paused {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800;
+  }
+
+  .status-draft {
+    @apply bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800;
+  }
+
+  /* Navigation active state */
+  .nav-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Charts and analytics */
+  .chart-container {
+    @apply bg-card rounded-lg p-6 shadow-sm border border-border;
+  }
+
+  /* Custom animations for better UX */
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.8s ease-out;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Smooth hover transitions */
+  .smooth-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .smooth-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, 
+      rgba(156, 163, 175, 0.1) 25%, 
+      rgba(156, 163, 175, 0.2) 50%, 
+      rgba(156, 163, 175, 0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+}
+
+/* Keyframe animations */
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes bounce-in {
+  0% { 
+    transform: scale(0.3); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+  70% { 
+    transform: scale(0.9); 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6); 
+  }
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

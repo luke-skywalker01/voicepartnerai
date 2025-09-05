@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoicePartnerAI Enterprise - UPDATED VERSION</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/vapi-integration.js"></script>
+    <script src="/voice-engine-real.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 280px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif; 
+            background: var(--bg-secondary); 
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Vapi-Style Template Modal - UPDATED DESIGN */
+        .vapi-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+
+        .vapi-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .vapi-modal-content {
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .vapi-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: none;
+        }
+
+        .vapi-header-content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .vapi-modal-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .vapi-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .vapi-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .vapi-modal-body {
+            padding: 2rem;
+        }
+
+        .vapi-templates-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* MODERN VAPI TEMPLATE CARDS */
+        .vapi-template-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .vapi-template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .vapi-template-header {
+            padding: 1.5rem 1.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .vapi-template-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .blank-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .support-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .appointment-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .qa-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        .vapi-template-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .vapi-template-content {
+            padding: 0 1.5rem 1rem;
+        }
+
+        .vapi-template-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 0.5rem;
+        }
+
+        .vapi-template-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .vapi-template-footer {
+            padding: 1rem 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f3f4f6;
+            background: #fafbfc;
+        }
+
+        .vapi-template-category {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .vapi-template-category.general { color: #667eea; }
+        .vapi-template-category.support { color: #f5576c; }
+        .vapi-template-category.sales { color: #00f2fe; }
+
+        .vapi-template-category i {
+            font-size: 0.5rem;
+        }
+
+        .vapi-template-arrow {
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+
+        .vapi-template-card:hover .vapi-template-arrow {
+            color: #667eea;
+            transform: translateX(6px);
+        }
+
+        .vapi-template-actions {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .vapi-btn-secondary {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .vapi-btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        /* Main Layout */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #6366f1);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-right: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+        }
+        
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border-right-color: var(--primary-color);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .page {
+            max-width: 1200px;
+        }
+        
+        .page.hidden {
+            display: none;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        .btn-create {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+        
+        .btn-create:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .vapi-templates-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .vapi-modal-content {
+                width: 98%;
+                margin: 1rem;
+            }
+            
+            .vapi-modal-header {
+                padding: 1.5rem;
+            }
+            
+            .vapi-modal-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            VoicePartnerAI Enterprise
+        </div>
+        <div>
+            <span>🚀 UPDATED VERSION - Vapi Style Templates</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <nav class="sidebar">
+            <a href="#" class="nav-item active" onclick="showPage('dashboard')">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('assistants')">
+                <i class="fas fa-robot"></i>
+                Assistants
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('workflows')">
+                <i class="fas fa-project-diagram"></i>
+                Workflows
+            </a>
+        </nav>
+        
+        <main class="content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Willkommen zu VoicePartnerAI Enterprise</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center;">
+                    <h2>🎉 UPDATED DASHBOARD</h2>
+                    <p>Alle Änderungen sollten jetzt sichtbar sein!</p>
+                    <p><strong>Test:</strong> Klicken Sie auf "Assistants" und dann "Neuen Assistant erstellen"</p>
+                </div>
+            </div>
+            
+            <!-- Assistants Page -->
+            <div id="assistants" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">🤖 Voice Assistants</h1>
+                    <p class="page-subtitle">Erstellen Sie professionelle AI-Assistants mit Vapi-Style Templates</p>
+                    <button class="btn-create" onclick="showCreateAssistant()" id="createAssistantBtn">
+                        <i class="fas fa-plus"></i> Neuen Assistant erstellen (UPDATED)
+                    </button>
+                </div>
+                
+                <div style="background: white; padding: 2rem; border-radius: 0.5rem;">
+                    <h3>✅ Template System Ready</h3>
+                    <p>Klicken Sie den Button oben um die neuen Vapi-Style Templates zu sehen!</p>
+                    <ul>
+                        <li>🎨 Modern Gradient Icons</li>
+                        <li>✨ Hover Effects</li>
+                        <li>🏷️ Template Badges</li>
+                        <li>🎯 Professional Layout</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Workflows Page -->
+            <div id="workflows" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Workflows</h1>
+                    <p class="page-subtitle">Workflow Management</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 0.5rem;">
+                    <p>Workflow functionality coming soon...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vapi-Style Template Selection Modal -->
+    <div id="templateSelectionModal" class="vapi-modal">
+        <div class="vapi-modal-content">
+            <div class="vapi-modal-header">
+                <div class="vapi-header-content">
+                    <h2 class="vapi-modal-title">Create Assistant</h2>
+                    <p class="vapi-modal-subtitle">Choose a template to get started</p>
+                </div>
+                <button class="vapi-modal-close" onclick="hideTemplateSelection()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="vapi-modal-body">
+                <div class="vapi-templates-container">
+                    <!-- Blank Template -->
+                    <div class="vapi-template-card" onclick="selectTemplate('blank')">
+                        <div class="vapi-template-header">
+                            <div class="vapi-template-icon blank-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="vapi-template-badge">Start Fresh</div>
+                        </div>
+                        <div class="vapi-template-content">
+                            <h3 class="vapi-template-title">Blank Template</h3>
+                            <p class="vapi-template-description">Start from scratch and build exactly what you need</p>
+                        </div>
+                        <div class="vapi-template-footer">
+                            <span class="vapi-template-category general">
+                                <i class="fas fa-circle"></i> General
+                            </span>
+                            <div class="vapi-template-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Support Template -->
+                    <div class="vapi-template-card" onclick="selectTemplate('customer_support')">
+                        <div class="vapi-template-header">
+                            <div class="vapi-template-icon support-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="vapi-template-badge">Most Popular</div>
+                        </div>
+                        <div class="vapi-template-content">
+                            <h3 class="vapi-template-title">Customer Support</h3>
+                            <p class="vapi-template-description">Handle customer inquiries with empathy and expertise</p>
+                        </div>
+                        <div class="vapi-template-footer">
+                            <span class="vapi-template-category support">
+                                <i class="fas fa-circle"></i> Support
+                            </span>
+                            <div class="vapi-template-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointment Booking Template -->
+                    <div class="vapi-template-card" onclick="selectTemplate('appointment_setter')">
+                        <div class="vapi-template-header">
+                            <div class="vapi-template-icon appointment-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="vapi-template-badge">Business</div>
+                        </div>
+                        <div class="vapi-template-content">
+                            <h3 class="vapi-template-title">Appointment Booking</h3>
+                            <p class="vapi-template-description">Efficiently schedule meetings and appointments</p>
+                        </div>
+                        <div class="vapi-template-footer">
+                            <span class="vapi-template-category sales">
+                                <i class="fas fa-circle"></i> Sales
+                            </span>
+                            <div class="vapi-template-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q&A Assistant Template -->
+                    <div class="vapi-template-card" onclick="selectTemplate('inbound_qa')">
+                        <div class="vapi-template-header">
+                            <div class="vapi-template-icon qa-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="vapi-template-badge">Knowledge Base</div>
+                        </div>
+                        <div class="vapi-template-content">
+                            <h3 class="vapi-template-title">Q&A Assistant</h3>
+                            <p class="vapi-template-description">Answer questions with comprehensive knowledge</p>
+                        </div>
+                        <div class="vapi-template-footer">
+                            <span class="vapi-template-category general">
+                                <i class="fas fa-circle"></i> General
+                            </span>
+                            <div class="vapi-template-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vapi-template-actions">
+                    <button class="vapi-btn-secondary" onclick="hideTemplateSelection()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedTemplate = null;
+
+        // Navigation
+        function showPage(pageId) {
+            console.log('🔄 Showing page:', pageId);
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                console.log('✅ Page shown:', pageId);
+            } else {
+                console.error('❌ Page not found:', pageId);
+            }
+            
+            // Add active class to clicked nav item
+            if (window.event && window.event.target) {
+                const navItem = window.event.target.closest('.nav-item');
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            }
+        }
+
+        // Assistant Creation
+        function showCreateAssistant() {
+            console.log('🚀 Opening template selection modal');
+            
+            const templateModal = document.getElementById('templateSelectionModal');
+            if (templateModal) {
+                templateModal.classList.add('show');
+                document.body.classList.add('modal-open');
+                console.log('✅ Template modal shown successfully');
+                
+                // Add analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'template_modal_opened', {
+                        'event_category': 'assistant_creation',
+                        'event_label': 'template_selection'
+                    });
+                }
+            } else {
+                console.error('❌ Template modal not found');
+                alert('Error: Template selection modal not found. Please refresh the page.');
+            }
+        }
+        
+        function hideTemplateSelection() {
+            const templateModal = document.getElementById('templateSelectionModal');
+            if (templateModal) {
+                templateModal.classList.remove('show');
+                document.body.classList.remove('modal-open');
+                console.log('🔄 Template modal closed');
+            }
+        }
+        
+        function selectTemplate(templateId) {
+            console.log('✅ Template selected:', templateId);
+            selectedTemplate = templateId;
+            
+            // Hide template selection
+            hideTemplateSelection();
+            
+            // Show success message
+            alert(`Template "${templateId}" selected! Wizard would start now.\n\nNext steps:\n1. Basic Configuration\n2. Voice Settings\n3. Model Configuration\n4. Advanced Options\n5. Review & Create`);
+            
+            // Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'template_selected', {
+                    'event_category': 'assistant_creation',
+                    'event_label': templateId
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 VoicePartnerAI Updated Dashboard loaded!');
+            console.log('🎨 New Vapi-Style Templates available');
+            console.log('✨ Modern UI with gradient icons and hover effects');
+            
+            // Test template modal after a short delay
+            setTimeout(() => {
+                console.log('🧪 Testing modal availability...');
+                const modal = document.getElementById('templateSelectionModal');
+                console.log('Modal found:', !!modal);
+                
+                const button = document.getElementById('createAssistantBtn');  
+                console.log('Button found:', !!button);
+                
+                if (modal && button) {
+                    console.log('✅ All components ready for assistant creation');
+                } else {
+                    console.error('❌ Missing components detected');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

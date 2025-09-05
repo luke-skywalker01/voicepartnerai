@@ -1,0 +1,1 @@
+{"name": "Customer Onboarding Workflow","description": "A workflow to onboard new customers","nodes": [{"id": "start","type": "conversation","data": {"type": "conversation","message": "Welcome\! What's your name?","variable": "customer_name"},"position": {"x": 100, "y": 100}}],"edges": [],"status": "active"}

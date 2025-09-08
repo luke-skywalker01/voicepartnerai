@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoicePartnerAI - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0E0E13;
+            color: #ffffff;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* VoicePartnerAI Dashboard 2.0 - Exact Dark Theme */
+        :root {
+            --bg-primary: #0E0E13;
+            --bg-secondary: #1a1a1f;
+            --bg-tertiary: #2a2a30;
+            --bg-card: #161618;
+            --border-primary: #2a2a30;
+            --border-secondary: #3a3a40;
+            --text-primary: #ffffff;
+            --text-secondary: #b4b4b8;
+            --text-muted: #6b6b70;
+            --accent-blue: #3b82f6;
+            --accent-blue-dark: #2563eb;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+        }
+
+        /* Top Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            color: var(--accent-blue);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .dashboard {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        /* Sidebar - Exact VoicePartnerAI Style */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--accent-blue);
+            border-left-color: var(--accent-blue);
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: var(--bg-primary);
+            overflow-y: auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-secondary);
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-blue-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 2rem;
+        }
+
+        /* Templates Grid */
+        .templates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .templates-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .template-categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-secondary);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .category-tab:hover, .category-tab.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Template Cards - Exact VoicePartnerAI Style */
+        .template-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .template-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+        }
+
+        .template-card.selected {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .template-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .template-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .template-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .template-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .template-tag.popular {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .template-tag.new {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .template-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Saved Assistants Grid */
+        .assistants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .assistant-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .assistant-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+        }
+        
+        .assistant-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .assistant-info h3 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .assistant-info .assistant-id {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+        
+        .assistant-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .assistant-status.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+        
+        .assistant-status.inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--text-muted);
+        }
+        
+        .assistant-preview {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .assistant-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-primary);
+        }
+        
+        .assistant-template {
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: capitalize;
+        }
+        
+        .assistant-date {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        .assistant-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .assistant-card:hover .assistant-actions {
+            opacity: 1;
+        }
+        
+        .assistant-action {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .assistant-action:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .assistant-action.delete:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-item {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .action-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        /* Usage Stats */
+        .usage-stats {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Success Message */
+        .success-message {
+            background: var(--accent-green);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            VoicePartnerAI
+        </div>
+        <div class="header-actions">
+            <div class="user-menu" style="position: relative;">
+                <div class="avatar">DU</div>
+                <span>Demo User</span>
+                <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer;" onclick="toggleUserMenu()"></i>
+                
+                <!-- User Dropdown Menu -->
+                <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 8px; min-width: 200px; z-index: 100; margin-top: 0.5rem; box-shadow: var(--shadow-lg);">
+                    <div style="padding: 1rem;">
+                        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.25rem;">Demo User</div>
+                        <div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">admin@momentum-solutions.de</div>
+                        <hr style="border: none; border-top: 1px solid var(--border-primary); margin-bottom: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <a href="#" class="dropdown-item" onclick="showSection('settings')" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.75rem; transition: background 0.2s;">
+                                <i class="fas fa-cog"></i>
+                                Account Settings
+                            </a>
+                            <a href="#" class="dropdown-item" onclick="showSection('billing')" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.75rem; transition: background 0.2s;">
+                                <i class="fas fa-credit-card"></i>
+                                Billing
+                            </a>
+                            <a href="#" class="dropdown-item" onclick="showSection('api-keys')" style="color: var(--text-secondary); text-decoration: none; padding: 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.75rem; transition: background 0.2s;">
+                                <i class="fas fa-key"></i>
+                                API Keys
+                            </a>
+                            <hr style="border: none; border-top: 1px solid var(--border-primary); margin: 0.5rem 0;">
+                            <a href="/" class="dropdown-item" onclick="logout()" style="color: var(--accent-red); text-decoration: none; padding: 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.75rem; transition: background 0.2s;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="#" class="nav-item" onclick="showSection('overview')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item active" onclick="showSection('assistants')">
+                    <i class="fas fa-robot"></i>
+                    <span>Assistants</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('workflows')">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Workflows</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Communication</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Phone Numbers</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-list"></i>
+                    <span>Call Logs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>Web Calls</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Analytics</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Billing</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>API Keys</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Overview Section -->
+            <div id="overview-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Overview</h1>
+                    <p class="page-subtitle">Your voice AI platform dashboard</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Assistant
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSection('analytics')">
+                            <i class="fas fa-chart-bar"></i>
+                            View Analytics
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <!-- Main Stats -->
+                    <div class="usage-stats">
+                        <h3 class="stats-title">Platform Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">47</div>
+                                <div class="stat-label">Active Assistants</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">12.4k</div>
+                                <div class="stat-label">Total Calls</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">€2,847</div>
+                                <div class="stat-label">Monthly Revenue</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">96%</div>
+                                <div class="stat-label">Uptime</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="quick-actions">
+                        <h3 class="quick-actions-title">Recent Activity</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">Customer Support Assistant</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Handled 23 calls today</div>
+                                </div>
+                                <div style="color: var(--accent-green); font-weight: 600;">+15%</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">Appointment Scheduler</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">12 appointments booked</div>
+                                </div>
+                                <div style="color: var(--accent-green); font-weight: 600;">+8%</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">Sales Agent Emma</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">€1,240 revenue generated</div>
+                                </div>
+                                <div style="color: var(--accent-green); font-weight: 600;">+22%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Chart Placeholder -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Call Volume Trends</h3>
+                        <div style="height: 200px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                            📊 Chart visualization would appear here
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assistants Section -->
+            <div id="assistants-section" class="section">
+                <div class="page-header">
+                    <h1 class="page-title">Assistants</h1>
+                    <p class="page-subtitle">Create and manage your voice AI assistants</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Assistant
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-upload"></i>
+                            Import
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <!-- Usage Stats -->
+                    <div class="usage-stats">
+                        <h3 class="stats-title">Usage This Month</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">1,247</div>
+                                <div class="stat-label">Total Calls</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">8.2m</div>
+                                <div class="stat-label">Minutes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">94%</div>
+                                <div class="stat-label">Success Rate</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">1.2s</div>
+                                <div class="stat-label">Avg Latency</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h3 class="quick-actions-title">Quick Actions</h3>
+                        <div class="actions-grid">
+                            <a href="#" class="action-item" onclick="openCreateModal('customer-support')">
+                                <div class="action-icon">🎧</div>
+                                <div>Customer Support</div>
+                            </a>
+                            <a href="#" class="action-item" onclick="openCreateModal('appointment-setter')">
+                                <div class="action-icon">📅</div>
+                                <div>Appointment Setter</div>
+                            </a>
+                            <a href="#" class="action-item" onclick="openCreateModal('lead-qualifier')">
+                                <div class="action-icon">🎯</div>
+                                <div>Lead Qualifier</div>
+                            </a>
+                            <a href="#" class="action-item" onclick="openCreateModal('sales-agent')">
+                                <div class="action-icon">💼</div>
+                                <div>Sales Agent</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Templates -->
+                    <div class="templates-header">
+                        <h3 class="templates-title">Choose a Template</h3>
+                    </div>
+
+                    <div class="template-categories">
+                        <button class="category-tab active" onclick="filterTemplates('all')">All</button>
+                        <button class="category-tab" onclick="filterTemplates('support')">Support</button>
+                        <button class="category-tab" onclick="filterTemplates('sales')">Sales</button>
+                        <button class="category-tab" onclick="filterTemplates('scheduling')">Scheduling</button>
+                        <button class="category-tab" onclick="filterTemplates('web')">Web</button>
+                    </div>
+
+                    <div class="templates-grid">
+                        <!-- Inbound Customer Support -->
+                        <div class="template-card" data-template="customer-support" data-category="support">
+                            <div class="template-icon">🎧</div>
+                            <h4 class="template-name">Inbound Customer Support</h4>
+                            <p class="template-description">Handle customer inquiries, support requests, and provide assistance with a professional and helpful tone.</p>
+                            <div class="template-tags">
+                                <span class="template-tag popular">Popular</span>
+                                <span class="template-tag">Support</span>
+                                <span class="template-tag">CRM</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 2.3k times</span>
+                                <span>⭐ 4.8</span>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Scheduling -->
+                        <div class="template-card" data-template="appointment-setter" data-category="scheduling">
+                            <div class="template-icon">📅</div>
+                            <h4 class="template-name">Appointment Scheduling</h4>
+                            <p class="template-description">Schedule appointments, manage calendars, and handle booking requests efficiently with calendar integrations.</p>
+                            <div class="template-tags">
+                                <span class="template-tag popular">Popular</span>
+                                <span class="template-tag">Scheduling</span>
+                                <span class="template-tag">Calendar</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 1.8k times</span>
+                                <span>⭐ 4.9</span>
+                            </div>
+                        </div>
+
+                        <!-- Lead Qualification -->
+                        <div class="template-card" data-template="lead-qualifier" data-category="sales">
+                            <div class="template-icon">🎯</div>
+                            <h4 class="template-name">Lead Qualification</h4>
+                            <p class="template-description">Qualify incoming leads, gather contact information, and route qualified prospects to sales teams.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Sales</span>
+                                <span class="template-tag">Lead Gen</span>
+                                <span class="template-tag">CRM</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 1.1k times</span>
+                                <span>⭐ 4.7</span>
+                            </div>
+                        </div>
+
+                        <!-- Phone Call Handler -->
+                        <div class="template-card" data-template="phone-handler" data-category="support">
+                            <div class="template-icon">📞</div>
+                            <h4 class="template-name">Phone Call Handler</h4>
+                            <p class="template-description">Professional phone answering service with call routing, message taking, and basic information gathering.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Phone</span>
+                                <span class="template-tag">Routing</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 892 times</span>
+                                <span>⭐ 4.6</span>
+                            </div>
+                        </div>
+
+                        <!-- Web Call Assistant -->
+                        <div class="template-card" data-template="web-assistant" data-category="web">
+                            <div class="template-icon">🌐</div>
+                            <h4 class="template-name">Web Call Assistant</h4>
+                            <p class="template-description">Handle web-based voice calls, live chat support, and website visitor assistance with modern web integration.</p>
+                            <div class="template-tags">
+                                <span class="template-tag new">New</span>
+                                <span class="template-tag">Web</span>
+                                <span class="template-tag">Chat</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 654 times</span>
+                                <span>⭐ 4.8</span>
+                            </div>
+                        </div>
+
+                        <!-- Sales Agent -->
+                        <div class="template-card" data-template="sales-agent" data-category="sales">
+                            <div class="template-icon">💼</div>
+                            <h4 class="template-name">Sales Agent</h4>
+                            <p class="template-description">Proactive sales conversations, product demonstrations, objection handling, and deal closing assistance.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Sales</span>
+                                <span class="template-tag">Closing</span>
+                                <span class="template-tag">Demo</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 543 times</span>
+                                <span>⭐ 4.5</span>
+                            </div>
+                        </div>
+
+                        <!-- Blank Template -->
+                        <div class="template-card" data-template="blank" data-category="all">
+                            <div class="template-icon">⚡</div>
+                            <h4 class="template-name">Blank Assistant</h4>
+                            <p class="template-description">Start from scratch with a completely customizable assistant. Build your own conversation flows and logic.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Custom</span>
+                                <span class="template-tag">Flexible</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 2.1k times</span>
+                                <span>⭐ 4.9</span>
+                            </div>
+                        </div>
+
+                        <!-- Industry Specific -->
+                        <div class="template-card" data-template="healthcare" data-category="support">
+                            <div class="template-icon">🏥</div>
+                            <h4 class="template-name">Healthcare Assistant</h4>
+                            <p class="template-description">HIPAA-compliant assistant for healthcare inquiries, appointment scheduling, and patient support services.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Healthcare</span>
+                                <span class="template-tag">HIPAA</span>
+                                <span class="template-tag">Secure</span>
+                            </div>
+                            <div class="template-stats">
+                                <span>Used 421 times</span>
+                                <span>⭐ 4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Saved Assistants Grid -->
+                <div class="content-section" style="margin-top: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 style="color: var(--text-primary); font-weight: 600; margin: 0;">Your Assistants</h2>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-secondary" onclick="refreshAssistants()">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Assistants Grid -->
+                    <div id="savedAssistantsGrid" class="assistants-grid">
+                        <!-- Saved assistants will be loaded here -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="emptyAssistantsState" style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary); display: none;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                        <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No assistants created yet</h3>
+                        <p>Create your first AI assistant to get started</p>
+                        <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i>
+                            Create Assistant
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflows Section -->
+            <div id="workflows-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Workflows</h1>
+                    <p class="page-subtitle">Design complex conversation flows and automations</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="createWorkflow()">
+                            <i class="fas fa-plus"></i>
+                            Create Workflow
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Import Workflow
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="templates-header">
+                        <h3 class="templates-title">Workflow Templates</h3>
+                    </div>
+
+                    <div class="templates-grid">
+                        <!-- Multi-Step Appointment -->
+                        <div class="template-card">
+                            <div class="template-icon">🔄</div>
+                            <h4 class="template-name">Multi-Step Appointment Flow</h4>
+                            <p class="template-description">Complex appointment scheduling with availability checking, confirmation emails, and reminder sequences.</p>
+                            <div class="template-tags">
+                                <span class="template-tag popular">Popular</span>
+                                <span class="template-tag">Multi-step</span>
+                                <span class="template-tag">Email</span>
+                            </div>
+                        </div>
+
+                        <!-- Lead Qualification Workflow -->
+                        <div class="template-card">
+                            <div class="template-icon">🎯</div>
+                            <h4 class="template-name">Lead Qualification Workflow</h4>
+                            <p class="template-description">Sophisticated lead scoring, CRM integration, and automated follow-up sequences based on qualification criteria.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Automation</span>
+                                <span class="template-tag">CRM</span>
+                                <span class="template-tag">Scoring</span>
+                            </div>
+                        </div>
+
+                        <!-- Customer Support Escalation -->
+                        <div class="template-card">
+                            <div class="template-icon">📈</div>
+                            <h4 class="template-name">Support Escalation Flow</h4>
+                            <p class="template-description">Intelligent issue classification, knowledge base lookup, and escalation to human agents when needed.</p>
+                            <div class="template-tags">
+                                <span class="template-tag">Support</span>
+                                <span class="template-tag">Escalation</span>
+                                <span class="template-tag">KB</span>
+                            </div>
+                        </div>
+
+                        <!-- E-commerce Order Processing -->
+                        <div class="template-card">
+                            <div class="template-icon">🛒</div>
+                            <h4 class="template-name">Order Processing Workflow</h4>
+                            <p class="template-description">Complete e-commerce workflow with inventory checking, payment processing, and order confirmation.</p>
+                            <div class="template-tags">
+                                <span class="template-tag new">New</span>
+                                <span class="template-tag">E-commerce</span>
+                                <span class="template-tag">Payment</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Numbers Section -->
+            <div id="phone-numbers-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Phone Numbers</h1>
+                    <p class="page-subtitle">Manage your voice AI phone numbers and routing</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Buy Number
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-upload"></i>
+                            Port Number
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="color: var(--text-primary); font-weight: 600;">+49 30 12345678</h3>
+                                <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Active</span>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Berlin, Germany • Voice AI</p>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                                <span>Cost: €15/month</span>
+                                <span>Usage: 247 calls</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Configure</button>
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Analytics</button>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="color: var(--text-primary); font-weight: 600;">+43 1 9876543</h3>
+                                <span style="background: var(--accent-orange); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Setup</span>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Vienna, Austria • Appointment Booking</p>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                                <span>Cost: €18/month</span>
+                                <span>Usage: 89 calls</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Configure</button>
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Analytics</button>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="color: var(--text-primary); font-weight: 600;">+41 44 1234567</h3>
+                                <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Active</span>
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Zurich, Switzerland • Sales Support</p>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                                <span>Cost: €22/month</span>
+                                <span>Usage: 156 calls</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Configure</button>
+                                <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Analytics</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Available Numbers</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; text-align: center;">
+                                <div style="color: var(--text-primary); font-weight: 600;">🇩🇪 Germany</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">from €12/month</div>
+                                <button class="btn btn-primary" style="margin-top: 0.5rem; font-size: 0.75rem; padding: 0.5rem 1rem;">Browse</button>
+                            </div>
+                            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; text-align: center;">
+                                <div style="color: var(--text-primary); font-weight: 600;">🇦🇹 Austria</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">from €15/month</div>
+                                <button class="btn btn-primary" style="margin-top: 0.5rem; font-size: 0.75rem; padding: 0.5rem 1rem;">Browse</button>
+                            </div>
+                            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; text-align: center;">
+                                <div style="color: var(--text-primary); font-weight: 600;">🇨🇭 Switzerland</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">from €18/month</div>
+                                <button class="btn btn-primary" style="margin-top: 0.5rem; font-size: 0.75rem; padding: 0.5rem 1rem;">Browse</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Logs Section -->
+            <div id="call-logs-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Call Logs</h1>
+                    <p class="page-subtitle">View and analyze all voice AI calls</p>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div style="background: var(--bg-secondary); border-radius: 12px; overflow: hidden;">
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-primary);">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; font-weight: 600; color: var(--text-secondary); font-size: 0.875rem;">
+                                <div>Call Details</div>
+                                <div>Duration</div>
+                                <div>Status</div>
+                                <div>Cost</div>
+                                <div>Date</div>
+                                <div>Actions</div>
+                            </div>
+                        </div>
+                        
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border-primary);">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">+49 30 98765432</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Customer Support • Emma</div>
+                                    </div>
+                                    <div style="color: var(--text-primary);">4:32</div>
+                                    <div><span style="background: var(--accent-green); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Completed</span></div>
+                                    <div style="color: var(--text-primary);">€0.23</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Today, 14:32</div>
+                                    <div><button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">View</button></div>
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border-primary);">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">+43 1 55512345</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Appointment Booking • Lena</div>
+                                    </div>
+                                    <div style="color: var(--text-primary);">2:18</div>
+                                    <div><span style="background: var(--accent-green); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Completed</span></div>
+                                    <div style="color: var(--text-primary);">€0.12</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Today, 13:45</div>
+                                    <div><button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">View</button></div>
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border-primary);">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">+41 44 7654321</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Sales Support • Elite</div>
+                                    </div>
+                                    <div style="color: var(--text-primary);">8:42</div>
+                                    <div><span style="background: var(--accent-red); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Failed</span></div>
+                                    <div style="color: var(--text-primary);">€0.45</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Today, 12:22</div>
+                                    <div><button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">View</button></div>
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--border-primary);">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">+49 89 1122334</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Lead Qualifier • Bernd</div>
+                                    </div>
+                                    <div style="color: var(--text-primary);">6:15</div>
+                                    <div><span style="background: var(--accent-green); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Completed</span></div>
+                                    <div style="color: var(--text-primary);">€0.31</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Yesterday, 16:08</div>
+                                    <div><button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">View</button></div>
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 1rem;">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">+43 662 9876543</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.75rem;">Healthcare Assistant • Riley</div>
+                                    </div>
+                                    <div style="color: var(--text-primary);">3:27</div>
+                                    <div><span style="background: var(--accent-green); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Completed</span></div>
+                                    <div style="color: var(--text-primary);">€0.17</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Yesterday, 14:55</div>
+                                    <div><button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">View</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web Calls Section -->
+            <div id="web-calls-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Web Calls</h1>
+                    <p class="page-subtitle">Browser-based voice AI integration</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-code"></i>
+                            Get Embed Code
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-play"></i>
+                            Test Widget
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Active Widgets</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">Customer Support Widget</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">momentum-solutions.de</div>
+                                    </div>
+                                    <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Live</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">Sales Assistant</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">voicepartnerai.com</div>
+                                    </div>
+                                    <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Live</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Today's Stats</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-blue);">47</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Web Calls</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-green);">92%</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Connection Rate</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-purple);">3.2m</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Duration</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-orange);">1.8s</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Avg Latency</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Integration Code</h3>
+                        <div style="background: var(--bg-primary); border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.875rem; overflow-x: auto;">
+                            <div style="color: var(--text-secondary);">&lt;script src="https://cdn.voicepartnerai.com/widget.js"&gt;&lt;/script&gt;</div>
+                            <div style="color: var(--text-secondary);">&lt;script&gt;</div>
+                            <div style="color: var(--text-secondary); padding-left: 1rem;">VoicePartnerAI.init({</div>
+                            <div style="color: var(--text-secondary); padding-left: 2rem;">apiKey: 'your-api-key',</div>
+                            <div style="color: var(--text-secondary); padding-left: 2rem;">assistantId: 'assistant-id',</div>
+                            <div style="color: var(--text-secondary); padding-left: 2rem;">position: 'bottom-right'</div>
+                            <div style="color: var(--text-secondary); padding-left: 1rem;">});</div>
+                            <div style="color: var(--text-secondary);">&lt;/script&gt;</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Analytics</h1>
+                    <p class="page-subtitle">Detailed insights and performance metrics</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            Export Report
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-calendar"></i>
+                            Custom Date Range
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <!-- Key Metrics -->
+                    <div class="usage-stats">
+                        <h3 class="stats-title">Key Performance Indicators</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">€4,247</div>
+                                <div class="stat-label">Revenue (30d)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">8,329</div>
+                                <div class="stat-label">Total Calls</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">94.2%</div>
+                                <div class="stat-label">Success Rate</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">1.23s</div>
+                                <div class="stat-label">Avg Response Time</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">4.8</div>
+                                <div class="stat-label">Avg Rating</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">€0.51</div>
+                                <div class="stat-label">Cost per Call</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <!-- Call Volume Chart -->
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Call Volume Trends</h3>
+                            <div style="height: 300px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                📊 Interactive chart showing daily call volumes, peak hours, and trends over time
+                            </div>
+                        </div>
+
+                        <!-- Top Assistants -->
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Top Performing Assistants</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">Emma</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Customer Support</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: var(--accent-green); font-weight: 600;">2,847 calls</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">96% success</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">Lena</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Appointments</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: var(--accent-green); font-weight: 600;">1,923 calls</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">91% success</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">Elite</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Sales</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: var(--accent-green); font-weight: 600;">1,456 calls</div>
+                                        <div style="color: var(--text-secondary); font-size: 0.875rem;">88% success</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Geographic Distribution -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Geographic Distribution</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div style="height: 200px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                🗺️ Interactive map showing call distribution across DACH region
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span>🇩🇪</span>
+                                        <span style="color: var(--text-primary);">Germany</span>
+                                    </div>
+                                    <div style="color: var(--text-secondary);">4,847 calls (58%)</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span>🇦🇹</span>
+                                        <span style="color: var(--text-primary);">Austria</span>
+                                    </div>
+                                    <div style="color: var(--text-secondary);">2,156 calls (26%)</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span>🇨🇭</span>
+                                        <span style="color: var(--text-primary);">Switzerland</span>
+                                    </div>
+                                    <div style="color: var(--text-secondary);">1,326 calls (16%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Section -->
+            <div id="billing-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Billing & Usage</h1>
+                    <p class="page-subtitle">Monitor costs and manage your subscription</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-credit-card"></i>
+                            Update Payment
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-file-invoice"></i>
+                            Download Invoice
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <!-- Current Plan -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600;">Current Plan</h3>
+                            <span style="background: var(--accent-blue); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600;">Enterprise</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <div>
+                                <div style="color: var(--text-secondary); margin-bottom: 0.25rem;">Monthly Cost</div>
+                                <div style="color: var(--text-primary); font-size: 1.5rem; font-weight: 700;">€299/month</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-secondary); margin-bottom: 0.25rem;">Included Minutes</div>
+                                <div style="color: var(--text-primary); font-size: 1.5rem; font-weight: 700;">50,000</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-secondary); margin-bottom: 0.25rem;">Extra Rate</div>
+                                <div style="color: var(--text-primary); font-size: 1.5rem; font-weight: 700;">€0.05/min</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-secondary); margin-bottom: 0.25rem;">Next Billing</div>
+                                <div style="color: var(--text-primary); font-size: 1.5rem; font-weight: 700;">Oct 15</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage This Month -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Usage This Month</h3>
+                            <div style="height: 200px; background: var(--bg-tertiary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); margin-bottom: 1rem;">
+                                📈 Usage chart showing daily consumption vs. plan limits
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Used Minutes</div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">32,847 / 50,000</div>
+                                </div>
+                                <div style="background: var(--accent-green); height: 8px; width: 200px; border-radius: 4px; position: relative;">
+                                    <div style="background: var(--accent-blue); height: 100%; width: 65.7%; border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Cost Breakdown</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Base Plan</span>
+                                    <span style="color: var(--text-primary);">€299.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Extra Minutes</span>
+                                    <span style="color: var(--text-primary);">€0.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Phone Numbers</span>
+                                    <span style="color: var(--text-primary);">€55.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary);">Add-ons</span>
+                                    <span style="color: var(--text-primary);">€25.00</span>
+                                </div>
+                                <hr style="border: none; border-top: 1px solid var(--border-primary);">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-primary); font-weight: 600;">Total</span>
+                                    <span style="color: var(--text-primary); font-weight: 600;">€379.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment History -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Payment History</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">September 2024</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Invoice #INV-2024-09</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">€379.00</div>
+                                    <div style="color: var(--accent-green); font-size: 0.875rem;">Paid</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">August 2024</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Invoice #INV-2024-08</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">€354.00</div>
+                                    <div style="color: var(--accent-green); font-size: 0.875rem;">Paid</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">July 2024</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Invoice #INV-2024-07</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">€418.50</div>
+                                    <div style="color: var(--accent-green); font-size: 0.875rem;">Paid</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Keys Section -->
+            <div id="api-keys-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">API Keys</h1>
+                    <p class="page-subtitle">Manage your API keys and integrations</p>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create API Key
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-book"></i>
+                            View Documentation
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <!-- Active Keys -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Active API Keys</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div style="flex: 1;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">Production Key</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem; font-family: monospace;">vapi_live_••••••••••••3X7k</div>
+                                    <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">Created: Sep 1, 2024 • Last used: 2 hours ago</div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Active</span>
+                                    <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.5rem;">Revoke</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div style="flex: 1;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">Development Key</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem; font-family: monospace;">vapi_test_••••••••••••9M2p</div>
+                                    <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">Created: Aug 15, 2024 • Last used: 1 day ago</div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <span style="background: var(--accent-green); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Active</span>
+                                    <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.5rem;">Revoke</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                                <div style="flex: 1;">
+                                    <div style="color: var(--text-primary); font-weight: 600;">Webhook Key</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem; font-family: monospace;">vapi_hook_••••••••••••5L8w</div>
+                                    <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem;">Created: Jul 28, 2024 • Last used: Never</div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <span style="background: var(--accent-orange); color: white; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;">Inactive</span>
+                                    <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.5rem;">Revoke</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Usage Stats -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">API Usage (30d)</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-blue);">24,847</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Requests</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-green);">99.7%</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Success Rate</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-purple);">187ms</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Avg Latency</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-orange);">15</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Rate Limits</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                            <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Quick Integration</h3>
+                            <div style="background: var(--bg-primary); border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.875rem; margin-bottom: 1rem;">
+                                <div style="color: var(--text-secondary);">curl -X POST \</div>
+                                <div style="color: var(--text-secondary);">&nbsp;&nbsp;https://api.voicepartnerai.com/v1/calls \</div>
+                                <div style="color: var(--text-secondary);">&nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_KEY" \</div>
+                                <div style="color: var(--text-secondary);">&nbsp;&nbsp;-H "Content-Type: application/json"</div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%; font-size: 0.875rem;">Copy Example</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="section" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">Settings</h1>
+                    <p class="page-subtitle">Manage your account and preferences</p>
+                </div>
+
+                <div class="content-section">
+                    <!-- Account Information -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Account Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.875rem;">Company Name</label>
+                                <input type="text" value="Momentum Solutions GmbH" style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary);">
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.875rem;">Contact Email</label>
+                                <input type="email" value="admin@momentum-solutions.de" style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary);">
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.875rem;">Phone Number</label>
+                                <input type="tel" value="+49 30 12345678" style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary);">
+                            </div>
+                            <div>
+                                <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.875rem;">Time Zone</label>
+                                <select style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary);">
+                                    <option>Europe/Berlin (CET/CEST)</option>
+                                    <option>Europe/Vienna (CET/CEST)</option>
+                                    <option>Europe/Zurich (CET/CEST)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 1rem;">Save Changes</button>
+                    </div>
+
+                    <!-- Notification Preferences -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Notification Preferences</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">Email Notifications</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Receive updates about system status and bills</div>
+                                </div>
+                                <label style="position: relative; display: inline-block; width: 48px; height: 24px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent-blue); border-radius: 24px; transition: 0.3s;"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">SMS Alerts</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Critical system alerts and outages</div>
+                                </div>
+                                <label style="position: relative; display: inline-block; width: 48px; height: 24px;">
+                                    <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-tertiary); border-radius: 24px; transition: 0.3s;"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="color: var(--text-primary); font-weight: 600;">Weekly Reports</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Automated usage and performance summaries</div>
+                                </div>
+                                <label style="position: relative; display: inline-block; width: 48px; height: 24px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--accent-blue); border-radius: 24px; transition: 0.3s;"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Settings -->
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="color: var(--text-primary); font-weight: 600; margin-bottom: 1rem;">Security</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <button class="btn btn-secondary" style="justify-content: flex-start;">
+                                <i class="fas fa-key"></i>
+                                Change Password
+                            </button>
+                            <button class="btn btn-secondary" style="justify-content: flex-start;">
+                                <i class="fas fa-shield-alt"></i>
+                                Enable Two-Factor Authentication
+                            </button>
+                            <button class="btn btn-secondary" style="justify-content: flex-start;">
+                                <i class="fas fa-download"></i>
+                                Download Account Data
+                            </button>
+                            <button class="btn" style="justify-content: flex-start; background: var(--accent-red); color: white;">
+                                <i class="fas fa-trash"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Workflow Modal -->
+    <div id="workflowModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Workflow</h2>
+                <button class="modal-close" onclick="closeWorkflowModal()">&times;</button>
+            </div>
+            
+            <div class="success-message" id="workflowSuccessMessage">
+                <i class="fas fa-check-circle"></i>
+                Workflow created successfully!
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Workflow Name</label>
+                <input type="text" id="workflowName" placeholder="Enter workflow name..." style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary); font-size: 0.875rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 1rem; color: var(--text-primary); font-weight: 500;">Choose Template</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <label style="display: flex; align-items: center; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="workflowTemplate" value="appointment" style="margin-right: 0.75rem;">
+                        <div>
+                            <div style="color: var(--text-primary); font-weight: 600;">Multi-Step Appointment</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem;">Complex scheduling workflow</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="workflowTemplate" value="lead-qualification" style="margin-right: 0.75rem;">
+                        <div>
+                            <div style="color: var(--text-primary); font-weight: 600;">Lead Qualification</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem;">Automated lead scoring</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="workflowTemplate" value="support-escalation" style="margin-right: 0.75rem;">
+                        <div>
+                            <div style="color: var(--text-primary); font-weight: 600;">Support Escalation</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem;">Intelligent issue routing</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 1rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 8px; cursor: pointer;">
+                        <input type="radio" name="workflowTemplate" value="blank" checked style="margin-right: 0.75rem;">
+                        <div>
+                            <div style="color: var(--text-primary); font-weight: 600;">Blank Workflow</div>
+                            <div style="color: var(--text-secondary); font-size: 0.875rem;">Start from scratch</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeWorkflowModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createNewWorkflow()">
+                    <i class="fas fa-plus"></i>
+                    Create Workflow
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Assistant Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Assistant</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                Assistant created successfully!
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Assistant Name</label>
+                <input type="text" id="assistantName" placeholder="Enter assistant name..." style="width: 100%; padding: 0.75rem; background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 6px; color: var(--text-primary); font-size: 0.875rem;">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createAssistant()">
+                    <i class="fas fa-plus"></i>
+                    Create Assistant
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JavaScript Module with TypeScript-like types -->
+    <script src="../components/dashboard.js" defer></script>
+</body>
+</html>

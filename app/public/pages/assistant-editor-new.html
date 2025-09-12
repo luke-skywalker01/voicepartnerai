@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoicePartnerAI - Assistant Editor</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-card: #ffffff;
+            --border-primary: #e2e8f0;
+            --border-secondary: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-blue-dark: #2563eb;
+            --accent-green: #10b981;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --border-primary: #334155;
+            --border-secondary: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo i { color: var(--accent-blue); }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .btn-primary:hover { background: var(--accent-blue-dark); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .editor-header {
+            margin-bottom: 2rem;
+        }
+
+        .editor-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .editor-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Tab Navigation */
+        .tabs-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        /* Metrics Bar */
+        .metrics-bar {
+            padding: 1rem 1.5rem;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .metric-value.cost { color: #f59e0b; }
+        .metric-value.latency { color: #8b5cf6; }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .range-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-slider {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .range-value {
+            min-width: 60px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip.selected {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-switch.active { background: var(--accent-green); }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .actions-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-primary);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .actions-section .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+            .metrics-bar { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-microphone-alt"></i>
+            VoicePartnerAI
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="editor-header">
+            <h1 class="editor-title">Create New Assistant</h1>
+            <p class="editor-subtitle">Configure your voice assistant with custom settings and behavior</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="basic">
+                    <i class="fas fa-robot"></i>
+                    Basic Configuration
+                </button>
+                <button class="tab-btn" data-tab="model">
+                    <i class="fas fa-brain"></i>
+                    AI Model
+                </button>
+                <button class="tab-btn" data-tab="voice">
+                    <i class="fas fa-microphone"></i>
+                    Voice Settings
+                </button>
+                <button class="tab-btn" data-tab="tools">
+                    <i class="fas fa-tools"></i>
+                    Tools & Functions
+                </button>
+                <button class="tab-btn" data-tab="advanced">
+                    <i class="fas fa-cog"></i>
+                    Advanced
+                </button>
+            </div>
+
+            <!-- Metrics Bar -->
+            <div class="metrics-bar">
+                <div class="metric-item">
+                    <span class="metric-label">Estimated Cost:</span>
+                    <span class="metric-value cost">~€0.08/min</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Latency:</span>
+                    <span class="metric-value latency">~450ms</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Status:</span>
+                    <span class="status-badge">Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="tab-content active" id="basic-tab">
+            <div class="form-section">
+                <h2>Basic Configuration</h2>
+                <div class="form-group">
+                    <label class="form-label">Assistant Name</label>
+                    <input type="text" class="form-input" placeholder="Enter assistant name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">First Message</label>
+                    <textarea class="form-textarea" placeholder="What should the assistant say first?">Hello! How can I help you today?</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">System Prompt</label>
+                    <textarea class="form-textarea" placeholder="Instructions for how the assistant should behave...">You are a helpful voice assistant. Be professional, friendly, and concise.</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="model-tab">
+            <div class="form-section">
+                <h2>AI Model Configuration</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Provider</label>
+                        <select class="form-select">
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic Claude</option>
+                            <option value="google">Google Gemini</option>
+                            <option value="groq">Groq</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Model</label>
+                        <select class="form-select">
+                            <option value="gpt-4o">GPT-4o (Recommended)</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                            <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Temperature</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="0" max="2" step="0.1" value="0.7">
+                            <span class="range-value">0.7</span>
+                        </div>
+                        <p class="form-help">Creativity vs. consistency</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Tokens</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="50" max="4000" step="50" value="1500">
+                            <span class="range-value">1500</span>
+                        </div>
+                        <p class="form-help">Maximum response length</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Top P</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="0.1" max="1" step="0.1" value="0.9">
+                            <span class="range-value">0.9</span>
+                        </div>
+                        <p class="form-help">Token selection</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Model Features</label>
+                    <div class="chip-group">
+                        <div class="chip selected">📝 Structured Output</div>
+                        <div class="chip selected">🔄 Context Preservation</div>
+                        <div class="chip">⚡ Streaming Response</div>
+                        <div class="chip">📊 Token Optimization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="voice-tab">
+            <div class="form-section">
+                <h2>Voice Configuration</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Voice Provider</label>
+                        <select class="form-select">
+                            <option value="elevenlabs">ElevenLabs (Premium)</option>
+                            <option value="azure">Microsoft Azure</option>
+                            <option value="openai">OpenAI TTS</option>
+                            <option value="google">Google Cloud</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Voice Model</label>
+                        <select class="form-select">
+                            <option value="eleven-turbo-v2">Eleven Turbo v2 (DE) - Ultra Low Latency</option>
+                            <option value="rachel-german">Rachel (German)</option>
+                            <option value="david-german">David (German Male)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Speech Speed</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="0.5" max="2" step="0.1" value="1.0">
+                            <span class="range-value">1.0x</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Voice Stability</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="0" max="1" step="0.05" value="0.75">
+                            <span class="range-value">0.75</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Clarity</label>
+                        <div class="range-control">
+                            <input type="range" class="range-slider" min="0" max="1" step="0.05" value="0.85">
+                            <span class="range-value">0.85</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Voice Features</label>
+                    <div class="chip-group">
+                        <div class="chip selected">🎯 Real-time Processing</div>
+                        <div class="chip selected">🔇 Noise Suppression</div>
+                        <div class="chip">🌍 Multi-language Detection</div>
+                        <div class="chip">⚡ Ultra Low Latency</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tools-tab">
+            <div class="form-section">
+                <h2>Available Tools & Functions</h2>
+                <div class="form-group">
+                    <label class="form-label">📅 Calendar & Scheduling</label>
+                    <div class="chip-group">
+                        <div class="chip selected">Google Calendar</div>
+                        <div class="chip selected">Microsoft Outlook</div>
+                        <div class="chip">Calendly</div>
+                        <div class="chip">Apple Calendar</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">💼 CRM & Customer Management</label>
+                    <div class="chip-group">
+                        <div class="chip selected">HubSpot</div>
+                        <div class="chip selected">Salesforce</div>
+                        <div class="chip">Pipedrive</div>
+                        <div class="chip">Zoho CRM</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📧 Communication</label>
+                    <div class="chip-group">
+                        <div class="chip selected">Email (SMTP)</div>
+                        <div class="chip selected">SMS (Twilio)</div>
+                        <div class="chip">WhatsApp Business</div>
+                        <div class="chip">Slack</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🎯 Business Functions</label>
+                    <div class="chip-group">
+                        <div class="chip selected">🗓️ Appointment Booking</div>
+                        <div class="chip selected">📋 Data Collection</div>
+                        <div class="chip selected">🎯 Lead Qualification</div>
+                        <div class="chip">💰 Price Information</div>
+                        <div class="chip">📞 Call Transfer</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Custom Webhook URL</label>
+                    <input type="url" class="form-input" placeholder="https://api.yourcompany.com/webhook">
+                    <p class="form-help">Connect to your own backend for custom functionality</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="advanced-tab">
+            <div class="form-section">
+                <h2>Advanced Configuration</h2>
+                <h3 style="margin: 2rem 0 1rem 0; color: var(--text-primary); font-size: 1.1rem;">⏱️ Timing & Behavior</h3>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Max Call Duration (min)</label>
+                        <input type="number" class="form-input" value="30" min="1" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Silence Detection (ms)</label>
+                        <input type="number" class="form-input" value="1500" min="500" max="10000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Response Timeout (ms)</label>
+                        <input type="number" class="form-input" value="3000" min="1000" max="15000">
+                    </div>
+                </div>
+                
+                <h3 style="margin: 2rem 0 1rem 0; color: var(--text-primary); font-size: 1.1rem;">🔒 Privacy & Security</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Call Recording</label>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                            <div class="toggle-switch"></div>
+                            <span>Record conversations for quality assurance</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">GDPR Compliance</label>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                            <div class="toggle-switch active"></div>
+                            <span>EU GDPR compliant data handling</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 2rem 0 1rem 0; color: var(--text-primary); font-size: 1.1rem;">📊 Analytics & Monitoring</h3>
+                <div class="form-group">
+                    <label class="form-label">Tracking Features</label>
+                    <div class="chip-group">
+                        <div class="chip selected">📈 Call Analytics</div>
+                        <div class="chip selected">⏱️ Response Time Monitoring</div>
+                        <div class="chip selected">😊 Sentiment Analysis</div>
+                        <div class="chip">🎯 Conversion Tracking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button class="btn" onclick="testAssistant()">
+                <i class="fas fa-play"></i>
+                Test Assistant
+            </button>
+            <button class="btn btn-primary" onclick="saveAssistant()">
+                <i class="fas fa-save"></i>
+                Save Assistant
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        function initializeTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            console.log('Initializing tabs:', tabBtns.length, 'buttons,', tabContents.length, 'contents');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab') + '-tab';
+                    console.log('Switching to tab:', targetTab);
+                    
+                    // Remove active class from all tabs and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    btn.classList.add('active');
+                    const targetElement = document.getElementById(targetTab);
+                    if (targetElement) {
+                        targetElement.classList.add('active');
+                        console.log('Successfully activated tab:', targetTab);
+                    } else {
+                        console.error('Target tab element not found:', targetTab);
+                    }
+                });
+            });
+        }
+
+        // Toggle switch functionality
+        function initializeToggles() {
+            const toggles = document.querySelectorAll('.toggle-switch');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                });
+            });
+        }
+
+        // Chip selection
+        function initializeChips() {
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chip.classList.toggle('selected');
+                });
+            });
+        }
+
+        // Range sliders
+        function initializeRanges() {
+            const ranges = document.querySelectorAll('.range-slider');
+            ranges.forEach(range => {
+                const valueSpan = range.parentElement.querySelector('.range-value');
+                range.addEventListener('input', () => {
+                    let value = range.value;
+                    if (range.parentElement.parentElement.querySelector('.form-label').textContent.includes('Speed')) {
+                        value += 'x';
+                    }
+                    valueSpan.textContent = value;
+                });
+            });
+        }
+
+        function testAssistant() {
+            alert('🎤 Testing assistant... This would start a test call in the full version.');
+        }
+
+        function saveAssistant() {
+            alert('💾 Saving assistant... This would save to the backend in the full version.');
+        }
+
+        // Initialize everything when DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing components...');
+            initializeTabs();
+            initializeToggles();
+            initializeChips();
+            initializeRanges();
+            
+            // Debug: List all tab content IDs
+            setTimeout(() => {
+                console.log('Available tab contents:');
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    console.log(`- ${tab.id}: ${tab.innerHTML.trim().length} characters, visible: ${getComputedStyle(tab).display !== 'none'}`);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

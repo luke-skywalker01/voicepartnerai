@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools - VoicePartnerAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #151515;
+            --bg-tertiary: #202020;
+            --bg-card: #191919;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar - Same as other pages */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            margin: 1rem 1.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        .create-tool-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 1rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tools-list {
+            flex: 1;
+            padding: 0.5rem 0;
+            overflow-y: auto;
+        }
+
+        .tool-item {
+            padding: 1rem 1.5rem;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .tool-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .tool-item.active {
+            background: var(--bg-tertiary);
+            border-left-color: var(--accent-orange);
+        }
+
+        .tool-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .tool-details .tool-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-details .tool-description {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tool-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .tool-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .title-info h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .title-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .function-badge {
+            background: var(--accent-purple);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: var(--bg-card);
+        }
+
+        .header-btn.primary {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .section-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-select {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-green);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .code-editor {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            min-height: 300px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .parameter-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .parameter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .parameter-name {
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-family: monospace;
+        }
+
+        .parameter-type {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .parameter-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .parameter-required {
+            background: var(--accent-red);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .add-property-btn {
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-property-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .editor-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .editor-tab {
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .editor-tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        .json-preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            color: var(--text-primary);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">VP</div>
+                <div class="logo-text">VoicePartnerAI</div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search Tools...">
+            </div>
+
+            <button class="create-tool-btn">
+                <i class="fas fa-plus"></i>
+                Create Tool
+            </button>
+
+            <div class="tools-list">
+                <div class="tool-item active">
+                    <div class="tool-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">manageMeeting</div>
+                        <div class="tool-description">verwaltet beratungstermin...</div>
+                    </div>
+                </div>
+                
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">scheduleMeeting</div>
+                        <div class="tool-description">Bucht ein 30-minütiges Ber...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">manageAppointment</div>
+                        <div class="tool-description">Verwaltet Termine (Buchen...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">checkAvailability</div>
+                        <div class="tool-description">Prüft verfügbare Termine fu...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">cancelSlots</div>
+                        <div class="tool-description">findet vereinbarte termine i...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">updateSlots</div>
+                        <div class="tool-description">Dieses Tool wird verwendet...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">bookSlot</div>
+                        <div class="tool-description">Dieses Tool ruft die Kalende...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">getSlots</div>
+                        <div class="tool-description">Dieses Tool ruft die Kalende...</div>
+                    </div>
+                </div>
+
+                <div class="tool-item">
+                    <div class="tool-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="tool-details">
+                        <div class="tool-name">caller_tool</div>
+                        <div class="tool-description">Caller information tool</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <div class="tool-title">
+                        <div class="tool-avatar">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="title-info">
+                            <h1>manageMeeting</h1>
+                            <p>c4163bae-fa8c-43b2-a8b9-b7d4789bac9f</p>
+                        </div>
+                    </div>
+                    <div class="function-badge">function</div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="header-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save
+                    </button>
+                    <button class="header-btn">
+                        <i class="fas fa-code"></i>
+                        Code
+                    </button>
+                    <button class="header-btn">
+                        <i class="fas fa-play"></i>
+                        Test
+                    </button>
+                    <button class="header-btn">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Tool Configuration -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">Tool Configuration</div>
+                    </div>
+                    <div class="section-content">
+                        <div class="form-group">
+                            <label class="form-label">Tool Name</label>
+                            <input type="text" class="form-input" value="manageMeeting">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <div class="form-help">Explain what this tool does and when to use it.</div>
+                            <textarea class="form-input form-textarea">Verwaltet Beratungstermine (Buchen, Ändern, Stornieren)</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Options</label>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>Async</span>
+                                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                                </div>
+                                <div class="form-help" style="margin: 0;">Tool executes asynchronously</div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>Strict</span>
+                                    <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                                </div>
+                                <div class="form-help" style="margin: 0;">Enforces strict parameter validation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">Parameters</div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="editor-tabs">
+                                <button class="editor-tab active">Visual Editor</button>
+                                <button class="editor-tab">JSON</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="form-help">Define the parameters your tool accepts.</div>
+                        
+                        <div class="parameter-item">
+                            <div class="parameter-header">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div class="parameter-name">action</div>
+                                    <div class="parameter-type">string</div>
+                                    <div class="parameter-required">Required</div>
+                                </div>
+                                <button class="header-btn" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="parameter-description">
+                                The action to perform: 'book', 'cancel', 'reschedule', or 'check_availability'
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Enum Values</label>
+                                <input type="text" class="form-input" value="book, cancel, reschedule, check_availability" placeholder="comma separated values">
+                            </div>
+                        </div>
+
+                        <div class="parameter-item">
+                            <div class="parameter-header">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div class="parameter-name">datetime</div>
+                                    <div class="parameter-type">string</div>
+                                </div>
+                                <button class="header-btn" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="parameter-description">
+                                Preferred date and time for the appointment (ISO 8601 format)
+                            </div>
+                        </div>
+
+                        <div class="parameter-item">
+                            <div class="parameter-header">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div class="parameter-name">customer_name</div>
+                                    <div class="parameter-type">string</div>
+                                </div>
+                                <button class="header-btn" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="parameter-description">
+                                Full name of the customer
+                            </div>
+                        </div>
+
+                        <div class="parameter-item">
+                            <div class="parameter-header">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div class="parameter-name">customer_phone</div>
+                                    <div class="parameter-type">string</div>
+                                </div>
+                                <button class="header-btn" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="parameter-description">
+                                Phone number of the customer
+                            </div>
+                        </div>
+
+                        <div class="parameter-item">
+                            <div class="parameter-header">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div class="parameter-name">service_type</div>
+                                    <div class="parameter-type">string</div>
+                                </div>
+                                <button class="header-btn" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="parameter-description">
+                                Type of service requested
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Enum Values</label>
+                                <input type="text" class="form-input" value="consultation, installation, repair, maintenance" placeholder="comma separated values">
+                            </div>
+                        </div>
+
+                        <button class="add-property-btn" onclick="addProperty()">
+                            <i class="fas fa-plus"></i>
+                            Add Property
+                        </button>
+
+                        <div class="form-group" style="margin-top: 2rem;">
+                            <label class="form-label">JSON Preview</label>
+                            <div class="json-preview" id="json-preview">{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "The action to perform: 'book', 'cancel', 'reschedule', or 'check_availability'",
+      "enum": ["book", "cancel", "reschedule", "check_availability"]
+    },
+    "datetime": {
+      "type": "string",
+      "description": "Preferred date and time for the appointment (ISO 8601 format)"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Full name of the customer"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Phone number of the customer"
+    },
+    "service_type": {
+      "type": "string",
+      "description": "Type of service requested",
+      "enum": ["consultation", "installation", "repair", "maintenance"]
+    }
+  },
+  "required": ["action"]
+}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Configuration -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">Server Configuration</div>
+                    </div>
+                    <div class="section-content">
+                        <div class="form-group">
+                            <label class="form-label">Endpoint URL</label>
+                            <div class="form-help">The URL where this tool will send requests</div>
+                            <input type="url" class="form-input" value="https://api.momentum-solutions.at/v1/appointments" placeholder="https://your-api.com/endpoint">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">HTTP Method</label>
+                            <select class="form-select">
+                                <option value="POST">POST</option>
+                                <option value="GET">GET</option>
+                                <option value="PUT">PUT</option>
+                                <option value="PATCH">PATCH</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Headers</label>
+                            <div class="form-help">Additional headers to send with requests</div>
+                            <div class="code-editor" contenteditable="true">{
+  "Authorization": "Bearer {{API_KEY}}",
+  "Content-Type": "application/json",
+  "X-Client-Version": "1.0.0"
+}</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Timeout (seconds)</label>
+                            <input type="number" class="form-input" value="30" min="1" max="300">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tool list item click
+        document.querySelectorAll('.tool-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.tool-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Toggle switch functionality
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Editor tabs
+        document.querySelectorAll('.editor-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Add property function
+        function addProperty() {
+            const propertyHtml = `
+                <div class="parameter-item">
+                    <div class="parameter-header">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="text" class="parameter-name" style="background: transparent; border: none; color: var(--accent-blue); font-family: monospace; font-weight: 600;" placeholder="property_name">
+                            <select class="parameter-type" style="background: var(--bg-secondary); border: none; color: var(--text-secondary); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
+                                <option value="string">string</option>
+                                <option value="number">number</option>
+                                <option value="boolean">boolean</option>
+                                <option value="array">array</option>
+                                <option value="object">object</option>
+                            </select>
+                        </div>
+                        <button class="header-btn" style="padding: 0.25rem 0.5rem;" onclick="this.closest('.parameter-item').remove()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <input type="text" class="form-input" placeholder="Property description" style="margin-bottom: 0.75rem;">
+                </div>
+            `;
+            
+            const addBtn = document.querySelector('.add-property-btn');
+            addBtn.insertAdjacentHTML('beforebegin', propertyHtml);
+        }
+
+        // Save tool functionality
+        async function saveTool() {
+            const toolData = {
+                name: document.querySelector('input[value="manageMeeting"]').value,
+                description: document.querySelector('.form-textarea').value,
+                endpoint: document.querySelector('input[type="url"]').value,
+                method: document.querySelector('.form-select').value,
+                // Add more fields as needed
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/api/tools/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(toolData)
+                });
+
+                if (response.ok) {
+                    console.log('Tool saved successfully');
+                }
+            } catch (error) {
+                console.error('Error saving tool:', error);
+            }
+        }
+
+        // Bind save button
+        document.querySelector('.header-btn.primary').addEventListener('click', saveTool);
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "VoicePartnerAI",
+    "version": "1.0.0",
+    "environment": "development",
+    "port": 3000
+  },
+  "api": {
+    "baseUrl": "http://localhost:8000",
+    "timeout": 5000,
+    "retries": 3
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "de",
+    "features": {
+      "phoneNumbers": true,
+      "callLogs": true,
+      "analytics": true,
+      "billing": true,
+      "apiKeys": true
+    }
+  },
+  "development": {
+    "hotReload": true,
+    "debugMode": true,
+    "mockApi": false
+  }
+}

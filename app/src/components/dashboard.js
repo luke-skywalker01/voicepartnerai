@@ -379,7 +379,9 @@ window.toggleUserMenu = () => {
 
 window.logout = () => {
     console.log('🚪 Logging out...');
-    window.location.href = 'login.html';
+    localStorage.removeItem('voicepartnerai_session');
+    sessionStorage.removeItem('voicepartnerai_session');
+    window.location.href = '/pages/login.html';
 };
 
 // Initialize additional event listeners when DOM is loaded

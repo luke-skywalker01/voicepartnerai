@@ -132,7 +132,7 @@ class VoicePartnerAIDashboard {
         setTimeout(() => {
             this.closeModal();
             console.log(`✅ Assistant "${name}" created successfully!`);
-            window.location.href = `/assistant-editor.html?name=${encodeURIComponent(name)}&template=${this.selectedTemplate || 'blank'}`;
+            window.location.href = `/pages/assistant-editor.html?name=${encodeURIComponent(name)}&template=${this.selectedTemplate || 'blank'}`;
         }, 1500);
     }
     
@@ -240,7 +240,7 @@ class VoicePartnerAIDashboard {
      * @param {Assistant} assistant 
      */
     editAssistant(assistant) {
-        window.location.href = `/assistant-editor.html?name=${encodeURIComponent(assistant.name)}&template=${assistant.template}&edit=true`;
+        window.location.href = `/pages/assistant-editor.html?name=${encodeURIComponent(assistant.name)}&template=${assistant.template}&edit=true`;
     }
     
     /**
@@ -379,7 +379,9 @@ window.toggleUserMenu = () => {
 
 window.logout = () => {
     console.log('🚪 Logging out...');
-    window.location.href = 'login.html';
+    localStorage.removeItem('voicepartnerai_session');
+    sessionStorage.removeItem('voicepartnerai_session');
+    window.location.href = '/pages/login.html';
 };
 
 // Initialize additional event listeners when DOM is loaded

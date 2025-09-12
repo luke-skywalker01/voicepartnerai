@@ -1,0 +1,33 @@
+{
+  "name": "voicepartnerai-app",
+  "version": "1.0.0",
+  "description": "VoicePartnerAI Frontend Application - Enterprise Voice AI Platform",
+  "main": "public/pages/index.html",
+  "scripts": {
+    "dev": "python -m http.server 3000 --directory public",
+    "start": "npm run dev",
+    "build": "echo 'Build process - copying files to dist/'",
+    "test": "echo 'Running frontend tests'",
+    "lint": "echo 'Running ESLint'",
+    "serve": "python -m http.server 8080 --directory public"
+  },
+  "keywords": [
+    "voice-ai",
+    "vapi",
+    "enterprise",
+    "dashboard",
+    "typescript",
+    "javascript"
+  ],
+  "author": "VoicePartnerAI Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "python": ">=3.8.0"
+  }
+}

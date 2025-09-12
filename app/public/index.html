@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoicePartnerAI - Weiterleitung</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .redirect-container {
+            text-align: center;
+            background: #1a1a1a;
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid #333333;
+            max-width: 400px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+        .message {
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+        }
+        .spinner {
+            border: 2px solid #333333;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .manual-link {
+            margin-top: 2rem;
+        }
+        .manual-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        .manual-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-container">
+        <div class="logo">VoicePartnerAI</div>
+        <div class="message">Weiterleitung zur Landing Page...</div>
+        <div class="spinner"></div>
+        <div class="manual-link">
+            <a href="/pages/landing.html">Klicken Sie hier, wenn Sie nicht automatisch weitergeleitet werden</a>
+        </div>
+    </div>
+
+    <script>
+        // Automatische Weiterleitung nach 1 Sekunde
+        setTimeout(() => {
+            window.location.href = '/pages/landing.html';
+        }, 1000);
+        
+        // Sofortige Weiterleitung wenn schon eingeloggt (Dashboard verfügbar)
+        if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+            // Prüfe ob der Benutzer bereits eingeloggt ist
+            const isLoggedIn = localStorage.getItem('voicepartnerai_session') || 
+                              sessionStorage.getItem('voicepartnerai_session');
+            
+            if (isLoggedIn) {
+                window.location.href = '/pages/index.html';
+            } else {
+                // Nach Landing-Seite weiterleiten
+                setTimeout(() => {
+                    window.location.href = '/pages/landing.html';
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

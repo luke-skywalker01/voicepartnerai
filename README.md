@@ -456,4 +456,5 @@ Zu weit in Zukunft, noch keine Prio bekannt:
 1. Cluster fürs Deployment einrichten
 1. Authentifizierung
 1. Marketing Seite auslagern
+1. Im Frontend einheitlich mit styles arbeiten. nicht inline-styles und definierte klassen im html
 1. Dark-Theme entwickeln

@@ -83,27 +83,76 @@ pip --version     # Latest
    - **Hauptanwendung**: http://localhost:3000
    - **API Dokumentation**: http://localhost:8000/docs
 
-## 🎯 Hauptfunktionen
+## 🗺️ Projektentwicklung Roadmap
 
-### ✅ Implementierte Features:
+### 📊 Kurzfristig (0-3 Monate) - MVP Vervollständigung
+**Priorität: Kritisch für Go-Live**
 
-- **Voice Assistant Management**: Assistenten erstellen, bearbeiten, löschen
-- **Template System**: 8 vorgefertigte Templates (Customer Support, Sales, etc.)
-- **Theme System**: Dark/Light Mode Toggle mit Persistence
-- **Assistant Editor**: Vollständiger Editor mit Live Preview
-- **Real-time Testing**: Assistenten testen über API simulation
-- **Analytics Dashboard**: Übersichtsdashboard mit Metriken
-- **Responsive Design**: Funktioniert auf Desktop, Tablet, Mobile
-- **DSGVO-Ready**: Europäische Datenschutz-Standards integriert
+1. **🔗 Frontend-Backend Integration** [P0]
+   - API Client standardisieren und typisieren
+   - State Management zwischen Frontend/Backend
+   - Error Handling & UX Improvements
 
-### 🚧 Für Weiterentwicklung:
+2. **🗄️ Database Schema & Migration** [P0]
+   - SQLite → PostgreSQL Migration
+   - Assistant/User/CallLog Models
+   - Data Persistence & Backup Strategy
 
-- Database Integration (aktuell: In-Memory Storage)
-- Echte Voice Provider APIs (ElevenLabs, Azure, Google, Amazon)
-- User Authentication & Authorization
-- WebSocket Real-time Updates
-- Call Recording & Playback
-- Advanced Analytics & Reporting
+3. **🔐 User Authentication System** [P1]
+   - JWT/OAuth2 Implementation
+   - User Registration & Login
+   - Session Management & Security
+
+4. **🎤 Voice Provider APIs Integration** [P1]
+   - ElevenLabs, Azure Speech, Google Cloud
+   - Voice Model Management
+   - Real-time Voice Processing
+
+### 🚀 Mittelfristig (3-6 Monate) - Enterprise Features
+**Priorität: Competitive Advantage**
+
+5. **📊 Advanced Analytics Dashboard** [P2]
+   - Call Duration/Success Rate Metrics
+   - Time-series Analytics
+   - Export & Reporting Features
+
+6. **🔄 WebSocket Real-time Updates** [P2]
+   - Live Call Status Updates
+   - Multi-user Collaboration
+   - Real-time Notifications
+
+7. **📁 File Upload & Voice Models** [P3]
+   - Custom Voice Training
+   - Audio File Management
+   - Voice Cloning Features
+
+### 🌟 Langfristig (6+ Monate) - Skalierung & Innovation
+**Priorität: Market Leadership**
+
+8. **🤖 AI-powered Assistant Optimization** [P3]
+   - Machine Learning für Call Optimization
+   - Automated A/B Testing
+   - Intelligent Response Suggestions
+
+9. **🌍 Multi-Language Support** [P4]
+   - Deutsch, Englisch, Französisch, Italienisch
+   - Localized Voice Models
+   - Regional Compliance (DSGVO, etc.)
+
+10. **🏢 Enterprise SSO Integration** [P4]
+    - Active Directory Integration
+    - SAML/OIDC Support
+    - Enterprise Account Management
+
+### ✅ Bereits Implementiert:
+
+- **Voice Assistant Management**: Erstellen, bearbeiten, löschen
+- **Template System**: 8 professionelle Templates
+- **Theme System**: Dark/Light Mode mit Persistence
+- **Assistant Editor**: Live Preview & Testing
+- **Analytics Dashboard**: Basis-Metriken
+- **Responsive Design**: Mobile-optimiert
+- **DSGVO-Ready**: EU Datenschutz-Standards
 
 ## 💻 Entwicklung
 
@@ -361,16 +410,9 @@ class AssistantCreate(BaseModel):
     # Type hints für IDE support
 ```
 
-### Nächste Entwicklungsschritte:
+### Implementierungsplan:
 
-1. **Database Schema** implementieren (SQLAlchemy Models)
-2. **User Authentication** hinzufügen (JWT/OAuth2)
-3. **Voice Provider APIs** integrieren (ElevenLabs, Azure, etc.)
-4. **WebSocket Support** für Real-time Updates
-5. **File Upload** für Custom Voice Models
-6. **Advanced Analytics** mit Time-series Data
-7. **Docker Container** Setup finalisieren
-8. **CI/CD Pipeline** einrichten (GitHub Actions)
+Siehe **🗺️ Projektentwicklung Roadmap** weiter oben für detaillierte Entwicklungsschritte mit Prioritäten und Zeitplänen.
 
 ### Performance & Skalierung:
 

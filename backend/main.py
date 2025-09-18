@@ -22,12 +22,21 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Enable CORS for development
+# CORS Configuration for Marketing Site Integration
+origins = [
+    "http://localhost:3000",           # App Domain (Development)
+    "http://localhost:8080",           # Marketing Dev Server
+    "https://voicepartnerai.com",      # Marketing Production
+    "https://app.voicepartnerai.com",  # App Production
+    "http://127.0.0.1:3000",           # Alternative localhost
+    "http://127.0.0.1:8080",           # Alternative localhost
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -57,9 +66,31 @@ class User(BaseModel):
     email: str
     name: str
 
-# In-memory storage (replace with database in production)
+# Database Integration
+from database.config import get_db, init_db, get_db_info
+from database.models import User, Assistant, CallLog
+from database.migration import create_tables, seed_default_templates, migrate_from_memory_storage
+from sqlalchemy.orm import Session
+
+# In-memory storage (will be migrated to database)
 assistants_db = []
 users_db = []
+
+# Initialize database on startup
+try:
+    print("Initializing database...")
+    create_tables()
+    seed_default_templates()
+
+    # Migrate existing in-memory data if any
+    if assistants_db:
+        migrate_from_memory_storage(assistants_db)
+        assistants_db = []  # Clear after migration
+
+    print("Database initialization complete")
+except Exception as e:
+    print(f"Database initialization failed: {e}")
+    print("Falling back to in-memory storage")
 
 # Health Check
 @app.get("/")
@@ -209,12 +240,16 @@ async def reset_database():
     users_db = []
     return {"message": "Database reset successfully"}
 
+# Include Public API Router
+from api.public_api import router as public_router
+app.include_router(public_router)
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(
-        "main:app", 
-        host="0.0.0.0", 
-        port=port, 
+        "main:app",
+        host="0.0.0.0",
+        port=port,
         reload=True,
         log_level="info"
     )

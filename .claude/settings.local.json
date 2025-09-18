@@ -178,7 +178,9 @@
       "Bash(pip install:*)",
       "Bash(uvicorn:*)",
       "Read(//c/Users/lbi/OneDrive - Stiftung Myclimate/Dokumente/Privat/AI/Screen/**)",
-      "Read(//c/Users/lbi/OneDrive - Stiftung Myclimate/Bilder/Screenshots/**)"
+      "Read(//c/Users/lbi/OneDrive - Stiftung Myclimate/Bilder/Screenshots/**)",
+      "Bash(findstr:*)",
+      "Bash(del \"C:\\Users\\lbi\\OneDrive - Stiftung Myclimate\\Dokumente\\Privat\\AI\\WebDev\\Voicepartnerai.com\\docs\\README.md\")"
     ],
     "deny": [],
     "ask": [],

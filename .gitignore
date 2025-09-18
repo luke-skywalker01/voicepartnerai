@@ -67,3 +67,5 @@ temp/
 
 # Next.js cache
 .next/cache/
+
+**/__pycache__/**

@@ -462,3 +462,41 @@ MIT License - Siehe [LICENSE](LICENSE) für Details.
 ✅ **Production-Ready Architektur** - FastAPI, TypeScript-style, Testing, Docker-ready
 
 **Enterprise Voice AI für den deutschen und europäischen Markt** 🇪🇺
+
+# Roadmap BEISPIEL: unvollständig, zusammengefasst, unsortiert
+1. Voice Assistant Management: Assistenten erstellen, bearbeiten, löschen
+1. Template System: 8 vorgefertigte Templates (Customer Support, Sales, etc.)
+1. Assistant Editor: Vollständiger Editor mit Live Preview
+1. Real-time Testing: Assistenten testen über API simulation
+1. Responsive Design: Funktioniert auf Desktop, Tablet, Mobile
+1. DSGVO-Ready: Europäische Datenschutz-Standards integriert
+1. Database Integration (aktuell: In-Memory Storage)
+1. Database Schema implementieren (SQLAlchemy Models)
+1. Echte Voice Provider APIs integrieren (ElevenLabs, Azure, Google, Amazon)
+1. WebSocket Real-time Updates
+1. Call Recording & Playback
+1. Analytics Dashboard: Übersichtsdashboard mit Metriken & Reporting
+
+Zu weit in Zukunft, noch keine Prio bekannt:
+- Live Preview: Echtzeit-Vorschau beim Erstellen
+- Theme System: Dark/Light Mode Toggle mit Persistence
+- Auto-Save: Einstellungen werden automatisch gespeichert
+- User Authentication & Authorization hinzufügen (JWT/OAuth2)
+- WebSocket Support für Real-time Updates
+- File Upload für Custom Voice Models
+- Docker Container Setup finalisieren
+- CI/CD Pipeline einrichten (GitHub Actions)
+
+
+# Roadmap beispiel JAN
+1. Frontend an Backend anbinden
+1. Datenbank Schema entwerfen
+1. Backend an DB anbinden
+1. DevOps umgebung auswählen
+1. DevOps aufsetzen
+1. Pipeline einrichten
+1. Cluster fürs Deployment einrichten
+1. Authentifizierung
+1. Marketing Seite auslagern
+1. Im Frontend einheitlich mit styles arbeiten. nicht inline-styles und definierte klassen im html
+1. Dark-Theme entwickeln
